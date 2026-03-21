@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contacto - CUERAR TUCUMÁN. Escribinos por teléfono, correo electrónico o Instagram.">
+    <title>Contacto | CUERAR TUCUMÁN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="../index.html" class="encabezado__logo">
+                <span class="encabezado__logo-icono">🐂</span>
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="../index.html" class="encabezado__enlace-nav">Inicio</a></li>
+                    <li><a href="productos.html" class="encabezado__enlace-nav">Productos</a></li>
+                    <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="contacto.html" class="encabezado__enlace-nav activo">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== PORTADA CONTACTO ======== -->
+    <section class="portada-pagina">
+        <div class="portada-pagina__capa"></div>
+        <div class="portada-pagina__contenido">
+            <p class="portada-pagina__subtitulo">Estamos para ayudarte</p>
+            <h1 class="portada-pagina__titulo">Contacto</h1>
+        </div>
+    </section>
+
+    <!-- ======== CANALES DE CONTACTO ======== -->
+    <section class="contacto-canales">
+        <div class="contenedor">
+            <div class="contacto-canales__grilla">
+
+                <div class="canal-contacto">
+                    <div class="canal-contacto__icono-envolver">
+                        <span class="canal-contacto__icono">📞</span>
+                    </div>
+                    <h3 class="canal-contacto__titulo">Teléfono</h3>
+                    <p class="canal-contacto__texto">Llamanos en horario de atención</p>
+                    <a href="tel:+5493814000000" class="canal-contacto__dato">(0381) 400-0000</a>
+                </div>
+
+                <div class="canal-contacto canal-contacto--destacado">
+                    <div class="canal-contacto__icono-envolver">
+                        <span class="canal-contacto__icono">💬</span>
+                    </div>
+                    <h3 class="canal-contacto__titulo">WhatsApp</h3>
+                    <p class="canal-contacto__texto">Respondemos rápido, escribinos ahora</p>
+                    <a href="https://wa.me/5493814000000" class="canal-contacto__dato" target="_blank" rel="noopener">+54 9 381 400-0000</a>
+                    <a href="https://wa.me/5493814000000" class="canal-contacto__cta" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+                </div>
+
+                <div class="canal-contacto">
+                    <div class="canal-contacto__icono-envolver">
+                        <span class="canal-contacto__icono">✉️</span>
+                    </div>
+                    <h3 class="canal-contacto__titulo">Correo</h3>
+                    <p class="canal-contacto__texto">Te respondemos en menos de 24 hs</p>
+                    <a href="mailto:info@cuerartucuman.com" class="canal-contacto__dato">info@cuerartucuman.com</a>
+                </div>
+
+                <div class="canal-contacto">
+                    <div class="canal-contacto__icono-envolver">
+                        <span class="canal-contacto__icono">📸</span>
+                    </div>
+                    <h3 class="canal-contacto__titulo">Instagram</h3>
+                    <p class="canal-contacto__texto">Novedades, productos y promociones</p>
+                    <a href="https://www.instagram.com/cuerartucuman" class="canal-contacto__dato" target="_blank" rel="noopener">@cuerartucuman</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== FORMULARIO + INFO ======== -->
+    <section class="contacto" id="contacto">
+        <div class="contenedor">
+            <div class="contacto__layout">
+
+                <!-- Formulario -->
+                <div class="contacto__formulario-envolver">
+                    <div class="contacto__encabezado">
+                        <p class="encabezado-seccion__subtitulo">Escribinos</p>
+                        <h2 class="contacto__titulo">Envianos un mensaje</h2>
+                        <div class="encabezado-seccion__divisor encabezado-seccion__divisor--izquierda"></div>
+                        <p class="contacto__subtexto">Completá el formulario y nos comunicamos a la brevedad con vos.</p>
+                    </div>
+                    <form class="contacto__formulario" id="formularioContacto" novalidate>
+                        <div class="contacto__fila">
+                            <div class="campo">
+                                <label class="campo__etiqueta" for="nombre">Nombre completo</label>
+                                <input class="campo__input" type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                            </div>
+                            <div class="campo">
+                                <label class="campo__etiqueta" for="email">Correo electrónico</label>
+                                <input class="campo__input" type="email" id="email" name="email" placeholder="tu@correo.com" required>
+                            </div>
+                        </div>
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="asunto">Asunto</label>
+                            <select class="campo__input campo__select" id="asunto" name="asunto">
+                                <option value="">Seleccioná un tema...</option>
+                                <option value="consulta">Consulta de producto</option>
+                                <option value="mayorista">Compras mayoristas</option>
+                                <option value="pedido">Estado de pedido</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="mensaje">Mensaje</label>
+                            <textarea class="campo__input campo__textarea" id="mensaje" name="mensaje" placeholder="Contanos en qué podemos ayudarte..." rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="contacto__enviar">
+                            <span>Enviar mensaje</span>
+                            <span class="contacto__enviar-icono">→</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Info lateral -->
+                <aside class="contacto__lateral">
+                    <div class="contacto__info-bloque">
+                        <h3 class="contacto__info-titulo">Información</h3>
+
+                        <div class="contacto__info-item">
+                            <span class="contacto__info-icono">📍</span>
+                            <div>
+                                <strong>Dirección</strong>
+                                <p>San Miguel de Tucumán, Argentina</p>
+                            </div>
+                        </div>
+
+                        <div class="contacto__info-item">
+                            <span class="contacto__info-icono">🕐</span>
+                            <div>
+                                <strong>Horario de Atención</strong>
+                                <p>Lunes a Viernes: 9:00 – 18:00</p>
+                                <p>Sábados: 9:00 – 13:00</p>
+                            </div>
+                        </div>
+
+                        <div class="contacto__info-item">
+                            <span class="contacto__info-icono">🚚</span>
+                            <div>
+                                <strong>Envíos</strong>
+                                <p>A todo el país vía correo y transporte</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contacto__mapa">
+                        <div class="contacto__mapa-placeholder">
+                            <span class="contacto__mapa-icono">📍</span>
+                            <p>San Miguel de Tucumán</p>
+                            <span>Tucumán, Argentina</span>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== PIE DE PÁGINA ======== -->
+    <footer class="pie" id="pie">
+        <div class="contenedor">
+            <div class="pie__inferior">
+                <p>&copy; 2026 CUERAR TUCUMÁN. Todos los derechos reservados.</p>
+                <div class="pie__redes">
+                    <a href="#" class="pie__enlace-red" aria-label="Facebook">FB</a>
+                    <a href="#" class="pie__enlace-red" aria-label="Instagram">IG</a>
+                    <a href="#" class="pie__enlace-red" aria-label="WhatsApp">WA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
+    <a href="https://wa.me/5493814000000" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <script src="../src/js/main.js"></script>
+</body>
+</html>

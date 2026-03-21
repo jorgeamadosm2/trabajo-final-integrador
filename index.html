@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CUERAR TUCUMÁN - Tienda de materia prima y productos elaborados en cuero. Encontrá los mejores cueros y artículos artesanales en Tucumán.">
+    <title>CUERAR TUCUMÁN | Cuero Premium en Tucumán</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO / BARRA DE NAVEGACIÓN ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="index.html" class="encabezado__logo">
+                <span class="encabezado__logo-icono">🐂</span>
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="index.html" class="encabezado__enlace-nav activo">Inicio</a></li>
+                    <li><a href="pages/productos.html" class="encabezado__enlace-nav">Productos</a></li>
+                    <li><a href="pages/sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="pages/contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== PORTADA ======== -->
+    <section class="portada" id="portada">
+        <div class="portada__capa"></div>
+        <div class="portada__contenido">
+            <p class="portada__subtitulo">Desde Tucumán para todo el país</p>
+            <h1 class="portada__titulo">Materia Prima &amp; Productos <br>en <span class="portada__resaltado">Cuero Premium</span></h1>
+            <p class="portada__descripcion">
+                Más de 20 años seleccionando los mejores cueros y creando productos artesanales de calidad excepcional.
+            </p>
+            <div class="portada__botones">
+                <a href="pages/productos.html" class="boton boton--primario" id="portadaAccionPrimaria">Ver Productos</a>
+                <a href="pages/contacto.html" class="boton boton--secundario" id="portadaAccionSecundaria">Contactanos</a>
+            </div>
+        </div>
+        <div class="portada__indicador-scroll">
+            <span>Descubrí más</span>
+            <div class="portada__flecha-scroll"></div>
+        </div>
+    </section>
+
+    <!-- ======== BENEFICIOS ======== -->
+    <section class="beneficios" id="beneficios">
+        <div class="contenedor">
+            <div class="beneficios__grilla">
+                <div class="tarjeta-beneficio">
+                    <div class="tarjeta-beneficio__icono">🏆</div>
+                    <h3 class="tarjeta-beneficio__titulo">Calidad Premium</h3>
+                    <p class="tarjeta-beneficio__texto">Seleccionamos los mejores cueros del país para garantizar productos de primera calidad.</p>
+                </div>
+                <div class="tarjeta-beneficio">
+                    <div class="tarjeta-beneficio__icono">✋</div>
+                    <h3 class="tarjeta-beneficio__titulo">Hecho a Mano</h3>
+                    <p class="tarjeta-beneficio__texto">Cada producto es elaborado artesanalmente con técnicas tradicionales de marroquinería.</p>
+                </div>
+                <div class="tarjeta-beneficio">
+                    <div class="tarjeta-beneficio__icono">🚚</div>
+                    <h3 class="tarjeta-beneficio__titulo">Envíos a Todo el País</h3>
+                    <p class="tarjeta-beneficio__texto">Llevamos nuestros productos a cada rincón de Argentina con envío seguro.</p>
+                </div>
+                <div class="tarjeta-beneficio">
+                    <div class="tarjeta-beneficio__icono">💰</div>
+                    <h3 class="tarjeta-beneficio__titulo">Mejor Precio</h3>
+                    <p class="tarjeta-beneficio__texto">Precios directos de fábrica, sin intermediarios. La mejor relación calidad-precio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== CATEGORÍAS ======== -->
+    <section class="categorias" id="categorias">
+        <div class="contenedor">
+            <div class="encabezado-seccion">
+                <p class="encabezado-seccion__subtitulo">Nuestro catálogo</p>
+                <h2 class="encabezado-seccion__titulo">Categorías</h2>
+                <div class="encabezado-seccion__divisor"></div>
+            </div>
+            <div class="categorias__grilla">
+                <a href="pages/productos.html" class="tarjeta-categoria" id="categoriaMateriaPrima">
+                    <div class="tarjeta-categoria__contenedor-img">
+                        <img src="src/img/materia-prima.png" alt="Materia Prima en Cuero" class="tarjeta-categoria__imagen" loading="lazy">
+                        <div class="tarjeta-categoria__capa"></div>
+                    </div>
+                    <div class="tarjeta-categoria__contenido">
+                        <h3 class="tarjeta-categoria__titulo">Materia Prima</h3>
+                        <p class="tarjeta-categoria__texto">Cueros crudos, curtidos, semipreparados y terminados en todas las variedades.</p>
+                        <span class="tarjeta-categoria__enlace">Explorar →</span>
+                    </div>
+                </a>
+                <a href="pages/productos.html" class="tarjeta-categoria" id="categoriaProductos">
+                    <div class="tarjeta-categoria__contenedor-img">
+                        <img src="src/img/productos-elaborados.png" alt="Productos Elaborados en Cuero" class="tarjeta-categoria__imagen" loading="lazy">
+                        <div class="tarjeta-categoria__capa"></div>
+                    </div>
+                    <div class="tarjeta-categoria__contenido">
+                        <h3 class="tarjeta-categoria__titulo">Productos Elaborados</h3>
+                        <p class="tarjeta-categoria__texto">Carteras, billeteras, cinturones, calzado y más, todo hecho en cuero genuino.</p>
+                        <span class="tarjeta-categoria__enlace">Explorar →</span>
+                    </div>
+                </a>
+                <a href="pages/productos.html" class="tarjeta-categoria" id="categoriaAccesorios">
+                    <div class="tarjeta-categoria__contenedor-img">
+                        <img src="src/img/accesorios-cuero.png" alt="Herramientas y Accesorios para Cuero" class="tarjeta-categoria__imagen" loading="lazy">
+                        <div class="tarjeta-categoria__capa"></div>
+                    </div>
+                    <div class="tarjeta-categoria__contenido">
+                        <h3 class="tarjeta-categoria__titulo">Herramientas y Accesorios</h3>
+                        <p class="tarjeta-categoria__texto">Todo lo que necesitás para trabajar el cuero: herramientas, hilos, hebillas y más.</p>
+                        <span class="tarjeta-categoria__enlace">Explorar →</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== SOBRE NOSOTROS (VISTA PREVIA) ======== -->
+    <section class="vista-nosotros" id="vistaNosotros">
+        <div class="contenedor">
+            <div class="vista-nosotros__grilla">
+                <div class="vista-nosotros__contenedor-imagen">
+                    <img src="src/img/hero-banner.png" alt="Taller artesanal de cuero CUERAR TUCUMÁN" class="vista-nosotros__imagen" loading="lazy">
+                    <div class="vista-nosotros__insignia">
+                        <span class="vista-nosotros__insignia-numero">+20</span>
+                        <span class="vista-nosotros__insignia-texto">Años de experiencia</span>
+                    </div>
+                </div>
+                <div class="vista-nosotros__contenido">
+                    <p class="encabezado-seccion__subtitulo">Nuestra historia</p>
+                    <h2 class="encabezado-seccion__titulo">Tradición en Cuero</h2>
+                    <div class="encabezado-seccion__divisor encabezado-seccion__divisor--izquierda"></div>
+                    <p class="vista-nosotros__texto">
+                        En <strong>CUERAR TUCUMÁN</strong> combinamos la tradición artesanal con los más altos estándares de calidad. 
+                        Somos una empresa tucumana dedicada a la venta de materia prima y productos elaborados en cuero genuino.
+                    </p>
+                    <p class="vista-nosotros__texto">
+                        Trabajamos con los mejores curtidores del país para ofrecerte cueros de primera calidad, 
+                        y nuestros artesanos crean productos únicos que combinan diseño moderno con técnicas tradicionales.
+                    </p>
+                    <ul class="vista-nosotros__lista">
+                        <li>✓ Cueros seleccionados de primera calidad</li>
+                        <li>✓ Producción artesanal sustentable</li>
+                        <li>✓ Asesoramiento personalizado</li>
+                        <li>✓ Venta mayorista y minorista</li>
+                    </ul>
+                    <a href="pages/sobre-nosotros.html" class="boton boton--primario" id="botonNosotros">Conocé Nuestra Historia</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== PRODUCTOS DESTACADOS ======== -->
+    <section class="destacados" id="productosDestacados">
+        <div class="contenedor">
+            <div class="encabezado-seccion">
+                <p class="encabezado-seccion__subtitulo">Lo más elegido</p>
+                <h2 class="encabezado-seccion__titulo">Productos Destacados</h2>
+                <div class="encabezado-seccion__divisor"></div>
+            </div>
+            <div class="destacados__grilla">
+                <div class="tarjeta-producto" id="producto1">
+                    <div class="tarjeta-producto__etiqueta">Nuevo</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="src/img/productos-elaborados.png" alt="Cartera de cuero artesanal" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
+                        <h3 class="tarjeta-producto__titulo">Cartera Artesanal Premium</h3>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$45.000</span>
+                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tarjeta-producto" id="producto2">
+                    <div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular">Popular</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="src/img/materia-prima.png" alt="Cuero curtido al vegetal" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Materia Prima</span>
+                        <h3 class="tarjeta-producto__titulo">Cuero Curtido al Vegetal</h3>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$18.500 /m²</span>
+                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tarjeta-producto" id="producto3">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="src/img/accesorios-cuero.png" alt="Kit de herramientas para cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Herramientas</span>
+                        <h3 class="tarjeta-producto__titulo">Kit Herramientas Profesional</h3>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$32.000</span>
+                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="destacados__accion">
+                <a href="pages/productos.html" class="boton boton--contorno" id="botonTodosProductos">Ver Todos los Productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== TESTIMONIOS ======== -->
+    <section class="testimonios" id="testimonios">
+        <div class="contenedor">
+            <div class="encabezado-seccion">
+                <p class="encabezado-seccion__subtitulo">Lo que dicen nuestros clientes</p>
+                <h2 class="encabezado-seccion__titulo">Testimonios</h2>
+                <div class="encabezado-seccion__divisor"></div>
+            </div>
+            <div class="testimonios__grilla">
+                <div class="tarjeta-testimonio" id="testimonio1">
+                    <div class="tarjeta-testimonio__estrellas">★★★★★</div>
+                    <p class="tarjeta-testimonio__texto">"Excelente calidad de cuero. Compro materia prima para mi taller y siempre quedo satisfecho con el producto. Muy recomendable."</p>
+                    <div class="tarjeta-testimonio__autor">
+                        <div class="tarjeta-testimonio__avatar">MR</div>
+                        <div>
+                            <strong class="tarjeta-testimonio__nombre">Martín Rodríguez</strong>
+                            <span class="tarjeta-testimonio__rol">Artesano - Salta</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tarjeta-testimonio" id="testimonio2">
+                    <div class="tarjeta-testimonio__estrellas">★★★★★</div>
+                    <p class="tarjeta-testimonio__texto">"Compré una cartera y un cinturón y la verdad que son hermosos. El cuero es de primera y el acabado es impecable. Volveré a comprar."</p>
+                    <div class="tarjeta-testimonio__autor">
+                        <div class="tarjeta-testimonio__avatar">LG</div>
+                        <div>
+                            <strong class="tarjeta-testimonio__nombre">Laura Guzmán</strong>
+                            <span class="tarjeta-testimonio__rol">Cliente - Buenos Aires</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tarjeta-testimonio" id="testimonio3">
+                    <div class="tarjeta-testimonio__estrellas">★★★★★</div>
+                    <p class="tarjeta-testimonio__texto">"El asesoramiento que me dieron fue excelente. Me ayudaron a elegir el cuero ideal para mis proyectos. Envío rápido y seguro."</p>
+                    <div class="tarjeta-testimonio__autor">
+                        <div class="tarjeta-testimonio__avatar">CF</div>
+                        <div>
+                            <strong class="tarjeta-testimonio__nombre">Carlos Fernández</strong>
+                            <span class="tarjeta-testimonio__rol">Diseñador - Córdoba</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== BANNER DE ACCIÓN ======== -->
+    <section class="banner-accion" id="bannerAccion">
+        <div class="banner-accion__capa"></div>
+        <div class="contenedor">
+            <div class="banner-accion__contenido">
+                <h2 class="banner-accion__titulo">¿Necesitás cuero de calidad?</h2>
+                <p class="banner-accion__texto">Contactanos y recibí asesoramiento personalizado para tu proyecto. Venta mayorista y minorista.</p>
+                <div class="banner-accion__botones">
+                    <a href="pages/contacto.html" class="boton boton--blanco" id="botonContactoBanner">Contactanos Ahora</a>
+                    <a href="https://wa.me/5493814000000" class="boton boton--whatsapp" id="botonWhatsappBanner" target="_blank" rel="noopener">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== PIE DE PÁGINA ======== -->
+    <footer class="pie" id="pie">
+        <div class="contenedor">
+            <div class="pie__grilla">
+                <div class="pie__marca">
+                    <a href="index.html" class="pie__logo">
+                        <span class="encabezado__logo-icono">🐂</span>
+                        <div class="encabezado__logo-texto">
+                            <span class="encabezado__marca">CUERAR</span>
+                            <span class="encabezado__ubicacion">TUCUMÁN</span>
+                        </div>
+                    </a>
+                    <p class="pie__descripcion">
+                        Venta de materia prima y productos elaborados en cuero de primera calidad. 
+                        Más de 20 años de experiencia en el rubro.
+                    </p>
+                </div>
+
+                <div class="pie__enlaces">
+                    <h4 class="pie__titulo">Navegación</h4>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="pages/productos.html">Productos</a></li>
+                        <li><a href="pages/sobre-nosotros.html">Sobre Nosotros</a></li>
+                        <li><a href="pages/contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <div class="pie__enlaces">
+                    <h4 class="pie__titulo">Productos</h4>
+                    <ul>
+                        <li><a href="pages/productos.html">Materia Prima</a></li>
+                        <li><a href="pages/productos.html">Productos Elaborados</a></li>
+                        <li><a href="pages/productos.html">Herramientas</a></li>
+                        <li><a href="pages/productos.html">Accesorios</a></li>
+                    </ul>
+                </div>
+
+                <div class="pie__contacto">
+                    <h4 class="pie__titulo">Contacto</h4>
+                    <ul>
+                        <li>📍 San Miguel de Tucumán, Argentina</li>
+                        <li>📞 (0381) 400-0000</li>
+                        <li>✉️ info@cuerartucuman.com</li>
+                        <li>🕐 Lun a Vie: 9:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pie__inferior">
+                <p>&copy; 2026 CUERAR TUCUMÁN. Todos los derechos reservados.</p>
+                <div class="pie__redes">
+                    <a href="#" class="pie__enlace-red" aria-label="Facebook" id="redFb">FB</a>
+                    <a href="#" class="pie__enlace-red" aria-label="Instagram" id="redIg">IG</a>
+                    <a href="#" class="pie__enlace-red" aria-label="WhatsApp" id="redWa">WA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
+    <a href="https://wa.me/5493814000000" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <script src="src/js/main.js"></script>
+</body>
+</html>

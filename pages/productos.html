@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Productos CUERAR TUCUMÁN - Materia prima, productos elaborados y herramientas en cuero de primera calidad.">
+    <title>Productos | CUERAR TUCUMÁN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="../index.html" class="encabezado__logo">
+                <span class="encabezado__logo-icono">🐂</span>
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="../index.html" class="encabezado__enlace-nav">Inicio</a></li>
+                    <li><a href="productos.html" class="encabezado__enlace-nav activo">Productos</a></li>
+                    <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== PORTADA PRODUCTOS ======== -->
+    <section class="portada-pagina">
+        <div class="portada-pagina__capa"></div>
+        <div class="portada-pagina__contenido">
+            <p class="portada-pagina__subtitulo">Catálogo completo</p>
+            <h1 class="portada-pagina__titulo">Nuestros Productos</h1>
+        </div>
+    </section>
+
+    <!-- ======== FILTROS DE CATEGORÍA ======== -->
+    <section class="catalogo" id="catalogo">
+        <div class="contenedor">
+
+            <div class="catalogo__barra-filtros">
+                <div class="catalogo__filtros" id="filtros">
+                    <button class="catalogo__filtro activo" data-filtro="todos">
+                        <span class="catalogo__filtro-icono">◈</span>
+                        <span class="catalogo__filtro-texto">Todos</span>
+                        <span class="catalogo__filtro-cuenta">12</span>
+                    </button>
+                    <button class="catalogo__filtro" data-filtro="materia-prima">
+                        <span class="catalogo__filtro-icono">⬡</span>
+                        <span class="catalogo__filtro-texto">Materia Prima</span>
+                        <span class="catalogo__filtro-cuenta">4</span>
+                    </button>
+                    <button class="catalogo__filtro" data-filtro="elaborados">
+                        <span class="catalogo__filtro-icono">◇</span>
+                        <span class="catalogo__filtro-texto">Elaborados</span>
+                        <span class="catalogo__filtro-cuenta">4</span>
+                    </button>
+                    <button class="catalogo__filtro" data-filtro="herramientas">
+                        <span class="catalogo__filtro-icono">✦</span>
+                        <span class="catalogo__filtro-texto">Herramientas</span>
+                        <span class="catalogo__filtro-cuenta">4</span>
+                    </button>
+                </div>
+                <p class="catalogo__resultado" id="catalogo__resultado">Mostrando <strong>12</strong> productos</p>
+            </div>
+
+            <!-- ======== GRILLA DE PRODUCTOS ======== -->
+            <div class="catalogo__grilla" id="grillaProductos">
+
+                <!-- MATERIA PRIMA -->
+                <div class="tarjeta-producto" data-categoria="materia-prima">
+                    <div class="tarjeta-producto__etiqueta">Nuevo</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/materia-prima.png" alt="Cuero curtido al vegetal" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Materia Prima</span>
+                        <h3 class="tarjeta-producto__titulo">Cuero Curtido al Vegetal</h3>
+                        <p class="tarjeta-producto__descripcion">Cuero de alta calidad curtido con taninos naturales. Ideal para marroquinería y artesanías.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$18.500 /m²</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="materia-prima">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/cuero-crudo.png" alt="Cuero crudo sin curtir" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Materia Prima</span>
+                        <h3 class="tarjeta-producto__titulo">Cuero Crudo Natural</h3>
+                        <p class="tarjeta-producto__descripcion">Cuero sin curtir en su estado natural. Disponible en distintos tamaños y grosores.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$12.000 /m²</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="materia-prima">
+                    <div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular">Popular</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/materia-prima.png" alt="Cuero napa premium" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Materia Prima</span>
+                        <h3 class="tarjeta-producto__titulo">Cuero Napa Premium</h3>
+                        <p class="tarjeta-producto__descripcion">Cuero suave y flexible de primera calidad. Perfecto para carteras, billeteras y calzado.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$22.000 /m²</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="materia-prima">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/materia-prima.png" alt="Cuero repujado" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Materia Prima</span>
+                        <h3 class="tarjeta-producto__titulo">Cuero Repujado</h3>
+                        <p class="tarjeta-producto__descripcion">Cuero tratado especialmente para técnicas de repujado. Textura firme y uniforme.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$20.000 /m²</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCTOS ELABORADOS -->
+                <div class="tarjeta-producto" data-categoria="elaborados">
+                    <div class="tarjeta-producto__etiqueta">Nuevo</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/productos-elaborados.png" alt="Cartera artesanal de cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
+                        <h3 class="tarjeta-producto__titulo">Cartera Artesanal Premium</h3>
+                        <p class="tarjeta-producto__descripcion">Cartera de cuero genuino hecha a mano. Diseño clásico con terminación premium.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$45.000</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="elaborados">
+                    <div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular">Popular</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/cinturon-cuero.png" alt="Cinturón de cuero artesanal" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
+                        <h3 class="tarjeta-producto__titulo">Cinturón Artesanal</h3>
+                        <p class="tarjeta-producto__descripcion">Cinturón de cuero con hebilla de bronce. Disponible en varios talles y colores.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$15.000</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="elaborados">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/billetera-cuero.png" alt="Billetera de cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
+                        <h3 class="tarjeta-producto__titulo">Billetera Clásica</h3>
+                        <p class="tarjeta-producto__descripcion">Billetera de cuero genuino con múltiples compartimentos. Costura a mano.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$12.500</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="elaborados">
+                    <div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular">Popular</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/productos-elaborados.png" alt="Mochila artesanal de cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
+                        <h3 class="tarjeta-producto__titulo">Mochila Artesanal</h3>
+                        <p class="tarjeta-producto__descripcion">Mochila de cuero genuino con correas reforzadas. Diseño moderno y funcional.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$68.000</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HERRAMIENTAS -->
+                <div class="tarjeta-producto" data-categoria="herramientas">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/accesorios-cuero.png" alt="Kit de herramientas para cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Herramientas</span>
+                        <h3 class="tarjeta-producto__titulo">Kit Herramientas Profesional</h3>
+                        <p class="tarjeta-producto__descripcion">Kit completo con herramientas esenciales para trabajar el cuero: sacabocados, punzones y más.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$32.000</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="herramientas">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/accesorios-cuero.png" alt="Hilos encerados para cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Herramientas</span>
+                        <h3 class="tarjeta-producto__titulo">Hilos Encerados (Pack x10)</h3>
+                        <p class="tarjeta-producto__descripcion">Set de hilos encerados en 10 colores. Resistentes y duraderos para costura a mano.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$4.500</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="herramientas">
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/accesorios-cuero.png" alt="Hebillas y broches para cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Herramientas</span>
+                        <h3 class="tarjeta-producto__titulo">Hebillas y Broches Surtidos</h3>
+                        <p class="tarjeta-producto__descripcion">Pack variado de hebillas, broches y remaches metálicos. Acabado bronce y plata.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$6.800</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta-producto" data-categoria="herramientas">
+                    <div class="tarjeta-producto__etiqueta">Nuevo</div>
+                    <div class="tarjeta-producto__contenedor-img">
+                        <img src="../src/img/accesorios-cuero.png" alt="Cera para cuero" class="tarjeta-producto__imagen" loading="lazy">
+                    </div>
+                    <div class="tarjeta-producto__contenido">
+                        <span class="tarjeta-producto__categoria">Herramientas</span>
+                        <h3 class="tarjeta-producto__titulo">Cera y Tinte para Cuero</h3>
+                        <p class="tarjeta-producto__descripcion">Kit de cera natural y tintes para terminación y conservación del cuero artesanal.</p>
+                        <div class="tarjeta-producto__pie">
+                            <span class="tarjeta-producto__precio">$3.200</span>
+                            <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Banner mayorista -->
+            <div class="catalogo__banner-mayorista">
+                <div class="catalogo__banner-contenido">
+                    <h3 class="catalogo__banner-titulo">¿Comprás por mayor?</h3>
+                    <p class="catalogo__banner-texto">Tenemos precios especiales para compras mayoristas. Contactanos para recibir nuestra lista de precios.</p>
+                    <a href="contacto.html" class="boton boton--primario">Pedir Lista de Precios</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======== PIE DE PÁGINA ======== -->
+    <footer class="pie" id="pie">
+        <div class="contenedor">
+            <div class="pie__inferior">
+                <p>&copy; 2026 CUERAR TUCUMÁN. Todos los derechos reservados.</p>
+                <div class="pie__redes">
+                    <a href="#" class="pie__enlace-red" aria-label="Facebook">FB</a>
+                    <a href="#" class="pie__enlace-red" aria-label="Instagram">IG</a>
+                    <a href="#" class="pie__enlace-red" aria-label="WhatsApp">WA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
+    <a href="https://wa.me/5493814000000" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <script src="../src/js/main.js"></script>
+</body>
+</html>
