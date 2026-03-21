@@ -177,49 +177,8 @@
                 <h2 class="encabezado-seccion__titulo">Productos Destacados</h2>
                 <div class="encabezado-seccion__divisor"></div>
             </div>
-            <div class="destacados__grilla">
-                <div class="tarjeta-producto" id="producto1">
-                    <div class="tarjeta-producto__etiqueta">Nuevo</div>
-                    <div class="tarjeta-producto__contenedor-img">
-                        <img src="src/img/productos-elaborados.png" alt="Cartera de cuero artesanal" class="tarjeta-producto__imagen" loading="lazy">
-                    </div>
-                    <div class="tarjeta-producto__contenido">
-                        <span class="tarjeta-producto__categoria">Productos Elaborados</span>
-                        <h3 class="tarjeta-producto__titulo">Cartera Artesanal Premium</h3>
-                        <div class="tarjeta-producto__pie">
-                            <span class="tarjeta-producto__precio">$45.000</span>
-                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="tarjeta-producto" id="producto2">
-                    <div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular">Popular</div>
-                    <div class="tarjeta-producto__contenedor-img">
-                        <img src="src/img/materia-prima.png" alt="Cuero curtido al vegetal" class="tarjeta-producto__imagen" loading="lazy">
-                    </div>
-                    <div class="tarjeta-producto__contenido">
-                        <span class="tarjeta-producto__categoria">Materia Prima</span>
-                        <h3 class="tarjeta-producto__titulo">Cuero Curtido al Vegetal</h3>
-                        <div class="tarjeta-producto__pie">
-                            <span class="tarjeta-producto__precio">$18.500 /m²</span>
-                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="tarjeta-producto" id="producto3">
-                    <div class="tarjeta-producto__contenedor-img">
-                        <img src="src/img/accesorios-cuero.png" alt="Kit de herramientas para cuero" class="tarjeta-producto__imagen" loading="lazy">
-                    </div>
-                    <div class="tarjeta-producto__contenido">
-                        <span class="tarjeta-producto__categoria">Herramientas</span>
-                        <h3 class="tarjeta-producto__titulo">Kit Herramientas Profesional</h3>
-                        <div class="tarjeta-producto__pie">
-                            <span class="tarjeta-producto__precio">$32.000</span>
-                            <a href="pages/productos.html" class="tarjeta-producto__boton">Ver más</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Las cards se cargan dinámicamente desde la API por productos-api.js -->
+            <div class="destacados__grilla"></div>
             <div class="destacados__accion">
                 <a href="pages/productos.html" class="boton boton--contorno" id="botonTodosProductos">Ver Todos los Productos</a>
             </div>
@@ -350,10 +309,12 @@
     </footer>
 
     <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
-    <a href="https://wa.me/5493814000000" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+    <a href="https://wa.me/5493865234570" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
         💬
     </a>
 
+    <script src="src/js/api.js"></script>
+    <script src="src/js/productos-api.js"></script>
     <script src="src/js/main.js"></script>
 </body>
 </html>

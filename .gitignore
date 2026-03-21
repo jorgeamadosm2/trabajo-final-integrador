@@ -1,1 +1,14 @@
 .claude/
+
+# Secrets - NUNCA subir al repositorio
+backend/.env
+
+# Entorno virtual de Python
+backend/venv/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+
+# Base de datos local (si usaran SQLite)
+*.db
