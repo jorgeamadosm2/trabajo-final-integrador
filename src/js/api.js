@@ -3,7 +3,7 @@
  * Todos los demás archivos JS usan esta función para hacer peticiones.
  */
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://trabajo-final-integrador-58s4.onrender.com/api";
 
 /**
  * Hace una petición HTTP a la API.

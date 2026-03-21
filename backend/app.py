@@ -20,7 +20,9 @@ def create_app():
         "http://127.0.0.1:5500",
         "http://localhost:5500",
         "http://127.0.0.1:3000",
-        "null"  # permite abrir el HTML directamente como archivo
+        "null",  # permite abrir el HTML directamente como archivo
+        "https://trabajo-final-integrador-58s4.onrender.com",
+        # Vercel — se agrega la URL definitiva al desplegarlo
     ]}})
 
     # Registrar blueprints (rutas)
