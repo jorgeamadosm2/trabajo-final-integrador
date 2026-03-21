@@ -196,6 +196,12 @@ ul {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
+.encabezado__navegacion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .encabezado__lista-nav {
     display: flex;
     gap: 4px;
@@ -1304,6 +1310,50 @@ ul {
         border-radius: var(--radio-sm);
     }
 
+    /* Auth en mobile: apilado debajo de los links */
+    .encabezado__navegacion {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .encabezado__auth {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        padding-top: 12px;
+        margin-top: 4px;
+    }
+
+    .nav-auth__boton--login {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        text-align: left;
+        border: none;
+    }
+
+    .nav-auth__usuario {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+        padding: 4px 16px;
+    }
+
+    .nav-auth__nombre {
+        font-size: 0.95rem;
+    }
+
+    .nav-auth__boton--logout {
+        border: none;
+        padding: 8px 0;
+        font-size: 0.88rem;
+    }
+
     .portada__titulo {
         font-size: clamp(1.8rem, 7vw, 2.4rem);
     }
@@ -2137,4 +2187,249 @@ ul {
 .contacto__mapa-placeholder span {
     font-size: 0.78rem;
     color: var(--color-texto-claro);
+}
+
+/* ============================================================
+   AUTH — NAVBAR
+   El encabezado es oscuro (rgba 26,26,26), todos los colores
+   deben usar la misma paleta que los enlaces del nav.
+   ============================================================ */
+
+.encabezado__auth {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Botón base */
+.nav-auth__boton {
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    font-family: var(--fuente-cuerpo);
+    cursor: pointer;
+    transition: var(--transicion);
+    text-decoration: none;
+    border: none;
+    letter-spacing: 0.3px;
+}
+
+/* "Iniciar Sesión" — igual al enlace nav pero con borde sutil */
+.nav-auth__boton--login {
+    color: rgba(255, 255, 255, 0.65);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.nav-auth__boton--login:hover {
+    color: var(--color-blanco);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* "Salir" — texto tenue, sin borde llamativo */
+.nav-auth__boton--logout {
+    color: rgba(255, 255, 255, 0.45);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 5px 12px;
+    font-size: 0.78rem;
+}
+.nav-auth__boton--logout:hover {
+    color: #fca5a5;
+    background: rgba(220, 38, 38, 0.12);
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Sección de usuario logueado */
+.nav-auth__usuario {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Nombre del usuario — mismo tono que los enlaces del nav */
+.nav-auth__nombre {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.3px;
+}
+
+/* Badge de rol — fondo sutilmente oscuro */
+.nav-auth__rol {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.nav-auth__rol--admin {
+    background: rgba(201, 168, 76, 0.15);
+    color: var(--color-dorado);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+}
+.nav-auth__rol--usuario {
+    background: rgba(107, 174, 214, 0.15);
+    color: var(--color-arg-azul);
+    border: 1px solid rgba(107, 174, 214, 0.35);
+}
+
+/* Enlace al panel admin — resaltado con el azul del sitio */
+.nav-auth__enlace-admin {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-arg-azul);
+    text-decoration: none;
+    transition: var(--transicion);
+    padding: 7px 10px;
+    border-radius: 4px;
+}
+.nav-auth__enlace-admin:hover {
+    color: var(--color-blanco);
+    background: rgba(107, 174, 214, 0.15);
+}
+
+/* ============================================================
+   AUTH — PÁGINAS (LOGIN / REGISTRO)
+   ============================================================ */
+
+.pagina-auth {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    background: var(--color-fondo-seccion);
+}
+
+.auth-card {
+    background: var(--color-fondo-tarjeta);
+    border-radius: var(--radio-xl);
+    box-shadow: var(--sombra-xl);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card__encabezado {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-card__icono {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.auth-card__titulo {
+    font-family: var(--fuente-titulo);
+    font-size: 1.8rem;
+    color: var(--color-primario);
+    margin-bottom: 0.3rem;
+}
+
+.auth-card__subtitulo {
+    font-size: 0.88rem;
+    color: var(--color-texto-claro);
+}
+
+/* Error box */
+.auth-card__error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: var(--radio-md);
+    padding: 0.75rem 1rem;
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.auth-card__formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+/* Input con botón ojo */
+.campo__input-grupo {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.campo__input-grupo .campo__input {
+    padding-right: 44px;
+}
+.campo__ojo {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    line-height: 1;
+    color: var(--color-texto-claro);
+}
+
+/* Ayuda debajo del input */
+.campo__ayuda {
+    font-size: 0.75rem;
+    color: var(--color-texto-tenue);
+    margin-top: 4px;
+    display: block;
+}
+
+/* Sección "¿Sos administrador?" */
+.auth-card__admin-toggle {
+    border: 1.5px dashed var(--color-borde);
+    border-radius: var(--radio-md);
+    padding: 0.75rem 1rem;
+}
+.auth-card__admin-toggle summary {
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+    user-select: none;
+}
+.auth-card__admin-toggle summary:hover {
+    color: var(--color-primario);
+}
+
+.auth-card__submit {
+    width: 100%;
+    padding: 13px;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+.auth-card__footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--color-texto-claro);
+}
+
+.auth-card__link {
+    color: var(--color-primario);
+    font-weight: 600;
+    text-decoration: none;
+}
+.auth-card__link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 2rem 1.25rem;
+    }
+    .auth-card__titulo {
+        font-size: 1.5rem;
+    }
 }

@@ -8,3 +8,5 @@ class Config:
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-secret-key-cambiar-en-produccion")
     JWT_ACCESS_TOKEN_EXPIRES = 86400  # 24 horas en segundos
     DEBUG = os.environ.get("FLASK_ENV") == "development"
+    # Código secreto que debe ingresar quien quiera registrarse como admin
+    ADMIN_SECRET_CODE = os.environ.get("ADMIN_SECRET_CODE", "cuerar-admin-2024")

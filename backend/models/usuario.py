@@ -6,7 +6,7 @@ class Usuario(Document):
     nombre        = StringField(required=True, max_length=100)
     email         = EmailField(required=True, unique=True)
     password_hash = StringField(required=True)
-    es_admin      = BooleanField(default=True)
+    es_admin      = BooleanField(default=False)
     created_at    = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "usuarios"}
