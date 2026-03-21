@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | CUERAR TUCUMÁN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="../index.html" class="encabezado__logo">
+                <span class="encabezado__logo-icono">🐂</span>
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="../index.html" class="encabezado__enlace-nav">Inicio</a></li>
+                    <li><a href="productos.html" class="encabezado__enlace-nav">Productos</a></li>
+                    <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
+                </ul>
+                <div class="encabezado__auth" id="navAuth"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== PANEL ADMIN ======== -->
+    <main class="admin">
+
+        <!-- Banner del panel -->
+        <div class="admin__banner">
+            <div class="admin__banner-contenido">
+                <div>
+                    <h1 class="admin__banner-titulo">⚙ Panel de Administración</h1>
+                    <p class="admin__banner-subtitulo">Gestioná los productos y mensajes de CUERAR TUCUMÁN</p>
+                </div>
+                <!-- Estadísticas rápidas -->
+                <div class="admin__stats" id="adminStats">
+                    <div class="admin__stat">
+                        <span class="admin__stat-numero" id="statProductos">—</span>
+                        <span class="admin__stat-label">Productos activos</span>
+                    </div>
+                    <div class="admin__stat">
+                        <span class="admin__stat-numero" id="statInactivos">—</span>
+                        <span class="admin__stat-label">Inactivos</span>
+                    </div>
+                    <div class="admin__stat admin__stat--alerta" id="statMensajesBox">
+                        <span class="admin__stat-numero" id="statMensajes">—</span>
+                        <span class="admin__stat-label">Mensajes sin leer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin__contenedor">
+
+            <!-- Tabs de navegación -->
+            <div class="admin__tabs">
+                <button class="admin__tab admin__tab--activo" id="tabProductos" onclick="mostrarTab('productos')">
+                    📦 Productos
+                </button>
+                <button class="admin__tab" id="tabMensajes" onclick="mostrarTab('mensajes')">
+                    ✉ Mensajes
+                    <span class="admin__tab-badge" id="badgeMensajes" style="display:none;">0</span>
+                </button>
+            </div>
+
+            <!-- ══════════ TAB: PRODUCTOS ══════════ -->
+            <section id="seccionProductos" class="admin__seccion">
+
+                <!-- Botón agregar -->
+                <div class="admin__barra-acciones">
+                    <h2 class="admin__seccion-titulo">Gestión de Productos</h2>
+                    <button class="boton boton--primario admin__boton-agregar" onclick="toggleFormulario()">
+                        + Agregar Producto
+                    </button>
+                </div>
+
+                <!-- Formulario agregar/editar (oculto por defecto) -->
+                <div class="admin__formulario-card" id="formularioProducto" style="display:none;">
+                    <h3 class="admin__form-titulo" id="formTitulo">Agregar Producto</h3>
+                    <div id="formError" class="auth-card__error" style="display:none;"></div>
+                    <form id="formProducto" class="admin__form-grid">
+                        <input type="hidden" id="productoId">
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pNombre">Nombre *</label>
+                            <input class="campo__input" type="text" id="pNombre" placeholder="Ej: Cuero Curtido al Vegetal" required>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pPrecio">Precio (ARS) *</label>
+                            <input class="campo__input" type="number" id="pPrecio" placeholder="18500" min="0" required>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pCategoria">Categoría *</label>
+                            <select class="campo__input" id="pCategoria" required>
+                                <option value="">Seleccioná una categoría</option>
+                                <option value="materia-prima">Materia Prima</option>
+                                <option value="elaborados">Productos Elaborados</option>
+                                <option value="herramientas">Herramientas</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pUnidad">Unidad (opcional)</label>
+                            <input class="campo__input" type="text" id="pUnidad" placeholder="m², unidad, pack...">
+                        </div>
+
+                        <div class="campo admin__form-full">
+                            <label class="campo__etiqueta" for="pDescripcion">Descripción</label>
+                            <textarea class="campo__input" id="pDescripcion" rows="2" placeholder="Descripción del producto..."></textarea>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pImagenUrl">URL de imagen</label>
+                            <input class="campo__input" type="text" id="pImagenUrl" placeholder="../src/img/materia-prima.png">
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__etiqueta" for="pEtiqueta">Etiqueta</label>
+                            <select class="campo__input" id="pEtiqueta">
+                                <option value="">Sin etiqueta</option>
+                                <option value="Nuevo">Nuevo</option>
+                                <option value="Popular">Popular</option>
+                            </select>
+                        </div>
+
+                        <div class="campo admin__form-checks">
+                            <label class="admin__check-label">
+                                <input type="checkbox" id="pDestacado">
+                                Mostrar como destacado en Inicio
+                            </label>
+                            <label class="admin__check-label" id="checkActivoLabel" style="display:none;">
+                                <input type="checkbox" id="pActivo" checked>
+                                Producto activo (visible al público)
+                            </label>
+                        </div>
+
+                        <div class="admin__form-acciones">
+                            <button type="submit" class="boton boton--primario" id="btnGuardar">Guardar</button>
+                            <button type="button" class="boton boton--contorno" onclick="cancelarFormulario()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Filtro de categoría -->
+                <div class="admin__filtros">
+                    <button class="admin__filtro admin__filtro--activo" onclick="filtrarAdmin(this, '')">Todos</button>
+                    <button class="admin__filtro" onclick="filtrarAdmin(this, 'materia-prima')">Materia Prima</button>
+                    <button class="admin__filtro" onclick="filtrarAdmin(this, 'elaborados')">Elaborados</button>
+                    <button class="admin__filtro" onclick="filtrarAdmin(this, 'herramientas')">Herramientas</button>
+                </div>
+
+                <!-- Tabla de productos -->
+                <div class="admin__tabla-wrapper">
+                    <div id="listaProductos" class="admin__tabla-contenido">
+                        <p class="admin__cargando">Cargando productos...</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ══════════ TAB: MENSAJES ══════════ -->
+            <section id="seccionMensajes" class="admin__seccion" style="display:none;">
+
+                <div class="admin__barra-acciones">
+                    <h2 class="admin__seccion-titulo">Mensajes de Contacto</h2>
+                    <div class="admin__filtros-mensajes">
+                        <button class="admin__filtro admin__filtro--activo" onclick="filtrarMensajes(this, 'todos')">Todos</button>
+                        <button class="admin__filtro" onclick="filtrarMensajes(this, 'no_leidos')">Sin leer</button>
+                    </div>
+                </div>
+
+                <div id="listaMensajes">
+                    <p class="admin__cargando">Cargando mensajes...</p>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <script src="../src/js/api.js"></script>
+    <script src="../src/js/auth.js"></script>
+    <script src="../src/js/admin.js"></script>
+    <script src="../src/js/main.js"></script>
+</body>
+</html>

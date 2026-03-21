@@ -33,8 +33,24 @@ def listar_productos():
     Query params opcionales:
       ?categoria=materia-prima|elaborados|herramientas
       ?destacado=true
+      ?todos=true  (solo admin con JWT — muestra también los inactivos)
     """
-    filtros = {"activo": True}
+    from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+    from models import Usuario
+
+    # Si el admin pasa ?todos=true y tiene JWT válido, mostrar todos (activos e inactivos)
+    mostrar_todos = request.args.get("todos", "").lower() == "true"
+    if mostrar_todos:
+        try:
+            verify_jwt_in_request()
+            user_id = get_jwt_identity()
+            usuario = Usuario.objects(id=user_id).first()
+            if not usuario or not usuario.es_admin:
+                mostrar_todos = False
+        except Exception:
+            mostrar_todos = False
+
+    filtros = {} if mostrar_todos else {"activo": True}
     categoria = request.args.get("categoria")
     destacado  = request.args.get("destacado")
 
@@ -46,7 +62,7 @@ def listar_productos():
     if destacado and destacado.lower() == "true":
         filtros["destacado"] = True
 
-    productos = Producto.objects(**filtros)
+    productos = Producto.objects(**filtros).order_by("categoria", "nombre")
     return jsonify({
         "ok": True,
         "total": productos.count(),
