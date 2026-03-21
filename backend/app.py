@@ -22,7 +22,7 @@ def create_app():
         "http://127.0.0.1:3000",
         "null",  # permite abrir el HTML directamente como archivo
         "https://trabajo-final-integrador-58s4.onrender.com",
-        # Vercel — se agrega la URL definitiva al desplegarlo
+        "https://trabajo-final-integrador-coral.vercel.app",
     ]}})
 
     # Registrar blueprints (rutas)
