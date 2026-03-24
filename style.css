@@ -1275,7 +1275,7 @@ ul {
     }
 }
 
-/* Móvil */
+/* Telefono */
 @media (max-width: 768px) {
     .encabezado__boton-menu {
         display: flex;
@@ -1358,25 +1358,58 @@ ul {
         font-size: clamp(1.8rem, 7vw, 2.4rem);
     }
 
+    .portada-pagina {
+        padding: 120px 0 60px;
+    }
+
+    .nosotros-historia {
+        padding: 64px 0;
+    }
+
     .nosotros-historia__grilla {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 36px;
     }
 
     .nosotros-historia__imagen {
-        height: 300px;
+        height: 260px;
+    }
+
+    .nosotros-valores {
+        padding: 64px 0;
     }
 
     .nosotros-valores__grilla {
         grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 32px;
+    }
+
+    .tarjeta-valor {
+        padding: 24px 16px 20px;
+    }
+
+    .nosotros-estadisticas {
+        padding: 60px 0;
     }
 
     .nosotros-estadisticas__grilla {
         grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .nosotros-proceso {
+        padding: 64px 0;
     }
 
     .nosotros-proceso__grilla {
         grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        margin-top: 32px;
+    }
+
+    .paso-proceso {
+        padding: 0 12px;
     }
 
     .beneficios {
@@ -1505,8 +1538,75 @@ ul {
         align-items: center;
     }
 
+    /* Sobre Nosotros - móvil pequeño */
+    .portada-pagina {
+        padding: 100px 0 50px;
+    }
+
+    .nosotros-valores__grilla {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .nosotros-estadisticas__grilla {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .estadistica {
+        padding: 18px 10px;
+    }
+
+    .nosotros-proceso__grilla {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .paso-proceso {
+        padding: 0;
+    }
+
+    .paso-proceso__numero {
+        width: 60px;
+        height: 60px;
+        font-size: 1.1rem;
+    }
+
+    /* Contacto - móvil pequeño */
     .contacto-canales__grilla {
         grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .canal-contacto {
+        padding: 20px 12px 16px;
+    }
+
+    .canal-contacto__icono-envolver {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    .canal-contacto__titulo {
+        font-size: 0.9rem;
+    }
+
+    .canal-contacto__texto {
+        font-size: 0.72rem;
+    }
+
+    .canal-contacto__dato {
+        font-size: 0.78rem;
+    }
+
+    .canal-contacto__cta {
+        font-size: 0.75rem;
+        padding: 7px 14px;
+    }
+
+    .contacto {
+        padding: 56px 0 72px;
     }
 }
 
@@ -2087,7 +2187,7 @@ ul {
 .contacto__enviar:hover {
     background: var(--color-primario-oscuro);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(122, 59, 30, 0.3);
+    box-shadow: 0 4px 16px rgba(122,59,30,0.3);
 }
 
 .contacto__enviar-icono {
@@ -2268,9 +2368,9 @@ ul {
     letter-spacing: 0.5px;
 }
 .nav-auth__rol--admin {
-    background: rgba(201, 168, 76, 0.15);
+    background: rgba(107, 174, 214, 0.15);
     color: var(--color-dorado);
-    border: 1px solid rgba(201, 168, 76, 0.35);
+    border: 1px solid rgba(107, 174, 214, 0.35);
 }
 .nav-auth__rol--usuario {
     background: rgba(107, 174, 214, 0.15);
