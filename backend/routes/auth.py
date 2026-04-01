@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Message
-from app import mail
+from extensions import mail
 from models import Usuario
 import secrets
 from datetime import datetime, timedelta
