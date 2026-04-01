@@ -64,6 +64,9 @@ async function cargarCatalogo() {
     // Renderizar todas las cards
     grilla.innerHTML = productos.map(renderizarCard).join("");
 
+    // Notificar a main.js que los productos ya están en el DOM
+    document.dispatchEvent(new CustomEvent("productosListos"));
+
     // Actualizar los contadores en los botones de filtro
     const contadores = { "materia-prima": 0, "elaborados": 0, "herramientas": 0 };
     productos.forEach((p) => {
