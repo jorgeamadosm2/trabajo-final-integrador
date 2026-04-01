@@ -82,11 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---- Filtro de Productos (Catálogo) ----
-    const filtros = document.querySelectorAll('.catalogo__filtro');
-    const productos = document.querySelectorAll('.catalogo__grilla .tarjeta-producto');
-    const resultado = document.getElementById('catalogo__resultado');
+    // Los filtros se inicializan después de que productos-api.js cargue las cards
+    function inicializarFiltros() {
+        const filtros = document.querySelectorAll('.catalogo__filtro');
+        const tarjetas = document.querySelectorAll('.catalogo__grilla .tarjeta-producto');
+        const resultado = document.getElementById('catalogo__resultado');
 
-    if (filtros.length > 0 && productos.length > 0) {
+        if (filtros.length === 0 || tarjetas.length === 0) return;
+
         filtros.forEach(botonFiltro => {
             botonFiltro.addEventListener('click', () => {
                 filtros.forEach(f => f.classList.remove('activo'));
@@ -95,15 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const categoriaSeleccionada = botonFiltro.dataset.filtro;
                 let visibles = 0;
 
-                productos.forEach(producto => {
-                    const categoriaProducto = producto.dataset.categoria;
+                tarjetas.forEach(tarjeta => {
+                    const categoriaProducto = tarjeta.dataset.categoria;
                     if (categoriaSeleccionada === 'todos' || categoriaProducto === categoriaSeleccionada) {
-                        producto.classList.remove('oculto');
-                        producto.classList.add('mostrar');
+                        tarjeta.classList.remove('oculto');
+                        tarjeta.classList.add('mostrar');
                         visibles++;
                     } else {
-                        producto.classList.add('oculto');
-                        producto.classList.remove('mostrar');
+                        tarjeta.classList.add('oculto');
+                        tarjeta.classList.remove('mostrar');
                     }
                 });
 
@@ -113,4 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    document.addEventListener('productosListos', inicializarFiltros);
 });
