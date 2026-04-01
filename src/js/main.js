@@ -81,40 +81,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ---- Filtro de Productos (Catálogo) ----
+    // ---- Filtro de Productos (Catálogo) con paginación "Ver más" ----
     // Los filtros se inicializan después de que productos-api.js cargue las cards
     function inicializarFiltros() {
-        const filtros = document.querySelectorAll('.catalogo__filtro');
-        const tarjetas = document.querySelectorAll('.catalogo__grilla .tarjeta-producto');
-        const resultado = document.getElementById('catalogo__resultado');
+        const filtros    = document.querySelectorAll('.catalogo__filtro');
+        const todasLasTarjetas = Array.from(document.querySelectorAll('.catalogo__grilla .tarjeta-producto'));
+        const resultado  = document.getElementById('catalogo__resultado');
+        const btnVerMas  = document.getElementById('btnVerMas');
 
-        if (filtros.length === 0 || tarjetas.length === 0) return;
+        if (filtros.length === 0 || todasLasTarjetas.length === 0) return;
+
+        const POR_PAGINA = 6;
+        let tarjetasFiltradas = todasLasTarjetas; // cards que coinciden con el filtro activo
+        let mostradas = 0;
+
+        function actualizarVista() {
+            todasLasTarjetas.forEach((t, i) => {
+                const enFiltro = tarjetasFiltradas.includes(t);
+                const visible  = enFiltro && tarjetasFiltradas.indexOf(t) < mostradas;
+                t.classList.toggle('oculto', !visible);
+                t.classList.toggle('mostrar', visible);
+            });
+
+            if (resultado) {
+                const total = tarjetasFiltradas.length;
+                const shown = Math.min(mostradas, total);
+                resultado.innerHTML = `Mostrando <strong>${shown}</strong> de <strong>${total}</strong> producto${total !== 1 ? 's' : ''}`;
+            }
+
+            if (btnVerMas) {
+                btnVerMas.style.display = mostradas >= tarjetasFiltradas.length ? 'none' : 'block';
+            }
+        }
+
+        function aplicarFiltro(categoria) {
+            tarjetasFiltradas = categoria === 'todos'
+                ? todasLasTarjetas
+                : todasLasTarjetas.filter(t => t.dataset.categoria === categoria);
+            mostradas = Math.min(POR_PAGINA, tarjetasFiltradas.length);
+            actualizarVista();
+        }
 
         filtros.forEach(botonFiltro => {
             botonFiltro.addEventListener('click', () => {
                 filtros.forEach(f => f.classList.remove('activo'));
                 botonFiltro.classList.add('activo');
-
-                const categoriaSeleccionada = botonFiltro.dataset.filtro;
-                let visibles = 0;
-
-                tarjetas.forEach(tarjeta => {
-                    const categoriaProducto = tarjeta.dataset.categoria;
-                    if (categoriaSeleccionada === 'todos' || categoriaProducto === categoriaSeleccionada) {
-                        tarjeta.classList.remove('oculto');
-                        tarjeta.classList.add('mostrar');
-                        visibles++;
-                    } else {
-                        tarjeta.classList.add('oculto');
-                        tarjeta.classList.remove('mostrar');
-                    }
-                });
-
-                if (resultado) {
-                    resultado.innerHTML = `Mostrando <strong>${visibles}</strong> producto${visibles !== 1 ? 's' : ''}`;
-                }
+                aplicarFiltro(botonFiltro.dataset.filtro);
             });
         });
+
+        if (btnVerMas) {
+            btnVerMas.addEventListener('click', () => {
+                mostradas = Math.min(mostradas + POR_PAGINA, tarjetasFiltradas.length);
+                actualizarVista();
+            });
+        }
+
+        // Mostrar los primeros 6 al cargar
+        aplicarFiltro('todos');
     }
 
     document.addEventListener('productosListos', inicializarFiltros);
