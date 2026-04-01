@@ -147,6 +147,8 @@ def editar_producto(producto_id):
     producto.imagen_url  = data.get("imagen_url", producto.imagen_url)
     producto.etiqueta    = data.get("etiqueta", producto.etiqueta)
     producto.destacado   = bool(data.get("destacado", producto.destacado))
+    if "activo" in data:
+        producto.activo  = bool(data["activo"])
     producto.updated_at  = datetime.utcnow()
     producto.save()
 
