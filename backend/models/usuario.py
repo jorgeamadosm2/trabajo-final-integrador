@@ -3,11 +3,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 class Usuario(Document):
-    nombre        = StringField(required=True, max_length=100)
-    email         = EmailField(required=True, unique=True)
-    password_hash = StringField(required=True)
-    es_admin      = BooleanField(default=False)
-    created_at    = DateTimeField(default=datetime.utcnow)
+    nombre               = StringField(required=True, max_length=100)
+    email                = EmailField(required=True, unique=True)
+    password_hash        = StringField(required=True)
+    es_admin             = BooleanField(default=False)
+    created_at           = DateTimeField(default=datetime.utcnow)
+    reset_token          = StringField(default=None)
+    reset_token_expires  = DateTimeField(default=None)
 
     meta = {"collection": "usuarios"}
 
