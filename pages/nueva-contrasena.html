@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nueva contraseña - CUERAR TUCUMÁN">
+    <title>Nueva Contraseña | CUERAR TUCUMÁN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="../index.html" class="encabezado__logo">
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="../index.html" class="encabezado__enlace-nav">Inicio</a></li>
+                    <li><a href="productos.html" class="encabezado__enlace-nav">Productos</a></li>
+                    <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
+                </ul>
+                <div class="encabezado__auth" id="navAuth"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== PÁGINA DE NUEVA CONTRASEÑA ======== -->
+    <main class="pagina-auth">
+        <div class="auth-card">
+
+            <div class="auth-card__encabezado">
+                <span class="auth-card__icono">🔒</span>
+                <h1 class="auth-card__titulo">Nueva Contraseña</h1>
+                <p class="auth-card__subtitulo">Elegí una nueva contraseña para tu cuenta</p>
+            </div>
+
+            <div class="auth-card__error" id="authError" style="display:none;"></div>
+            <div class="auth-card__exito" id="authExito" style="display:none;"></div>
+
+            <!-- Se muestra si el token es inválido/expirado -->
+            <div id="tokenInvalido" style="display:none;text-align:center;padding:16px;">
+                <p style="color:#c0392b;margin-bottom:16px;">El link es inválido o ha expirado.</p>
+                <a href="recuperar-contrasena.html" class="boton boton--primario">Solicitar nuevo link</a>
+            </div>
+
+            <form class="auth-card__formulario" id="formNuevaContrasena" novalidate>
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="password">Nueva contraseña</label>
+                    <div class="campo__input-grupo">
+                        <input
+                            class="campo__input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Mínimo 6 caracteres"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="campo__ojo" id="togglePassword" aria-label="Ver contraseña">👁</button>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="confirmar">Confirmar contraseña</label>
+                    <div class="campo__input-grupo">
+                        <input
+                            class="campo__input"
+                            type="password"
+                            id="confirmar"
+                            name="confirmar"
+                            placeholder="Repetí la contraseña"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="campo__ojo" id="toggleConfirmar" aria-label="Ver contraseña">👁</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="boton boton--primario auth-card__submit" id="btnSubmit">
+                    Guardar contraseña
+                </button>
+
+            </form>
+
+            <div class="auth-card__footer">
+                <p><a href="login.html" class="auth-card__link">← Volver al inicio de sesión</a></p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ======== FOOTER SIMPLIFICADO ======== -->
+    <footer class="pie" style="margin-top:auto;">
+        <div class="pie__inferior">
+            <p class="pie__copyright">© 2024 CUERAR TUCUMÁN. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="../src/js/api.js"></script>
+    <script src="../src/js/auth.js"></script>
+    <script>
+        // Leer token desde la URL
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+
+        if (!token) {
+            document.getElementById("formNuevaContrasena").style.display = "none";
+            document.getElementById("tokenInvalido").style.display = "block";
+        }
+
+        // Mostrar/ocultar contraseñas
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const input = document.getElementById("password");
+            const esPassword = input.type === "password";
+            input.type = esPassword ? "text" : "password";
+            this.textContent = esPassword ? "🙈" : "👁";
+        });
+
+        document.getElementById("toggleConfirmar").addEventListener("click", function () {
+            const input = document.getElementById("confirmar");
+            const esPassword = input.type === "password";
+            input.type = esPassword ? "text" : "password";
+            this.textContent = esPassword ? "🙈" : "👁";
+        });
+
+        document.getElementById("formNuevaContrasena").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const errorDiv = document.getElementById("authError");
+            const exitoDiv = document.getElementById("authExito");
+            const btnSubmit = document.getElementById("btnSubmit");
+
+            errorDiv.style.display = "none";
+            exitoDiv.style.display = "none";
+
+            const password  = document.getElementById("password").value;
+            const confirmar = document.getElementById("confirmar").value;
+
+            if (!password || !confirmar) {
+                errorDiv.textContent = "Completá todos los campos.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            if (password.length < 6) {
+                errorDiv.textContent = "La contraseña debe tener al menos 6 caracteres.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            if (password !== confirmar) {
+                errorDiv.textContent = "Las contraseñas no coinciden.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = "Guardando...";
+
+            try {
+                await apiFetch("/auth/reset-password", {
+                    method: "POST",
+                    body: JSON.stringify({ token, password })
+                });
+
+                exitoDiv.textContent = "¡Contraseña actualizada! Redirigiendo al inicio de sesión...";
+                exitoDiv.style.display = "block";
+                document.getElementById("formNuevaContrasena").style.display = "none";
+
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2500);
+
+            } catch (error) {
+                if (error.message.includes("inválido") || error.message.includes("expirado")) {
+                    document.getElementById("formNuevaContrasena").style.display = "none";
+                    document.getElementById("tokenInvalido").style.display = "block";
+                } else {
+                    errorDiv.textContent = error.message;
+                    errorDiv.style.display = "block";
+                    btnSubmit.disabled = false;
+                    btnSubmit.textContent = "Guardar contraseña";
+                }
+            }
+        });
+    </script>
+    <script src="../src/js/main.js"></script>
+</body>
+</html>

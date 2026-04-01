@@ -10,3 +10,12 @@ class Config:
     DEBUG = os.environ.get("FLASK_ENV") == "development"
     # Código secreto que debe ingresar quien quiera registrarse como admin
     ADMIN_SECRET_CODE = os.environ.get("ADMIN_SECRET_CODE", "cuerar-admin-2024")
+    # URL del frontend (para armar el link de reset en el email)
+    FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://trabajo-final-integrador-coral.vercel.app")
+    # Flask-Mail (Gmail)
+    MAIL_SERVER   = "smtp.gmail.com"
+    MAIL_PORT     = 587
+    MAIL_USE_TLS  = True
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")   # tu-cuenta@gmail.com
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")   # contraseña de aplicación de Gmail
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_USERNAME")

@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_mail import Mail
 import mongoengine
 
 from config import Config
 
 jwt = JWTManager()
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)
@@ -16,6 +18,7 @@ def create_app():
 
     # Inicializar extensiones
     jwt.init_app(app)
+    mail.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": [
         "http://127.0.0.1:5500",
         "http://localhost:5500",
