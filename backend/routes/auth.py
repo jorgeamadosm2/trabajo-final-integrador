@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Message
+from bson.errors import InvalidId
 from extensions import mail
 from models import Usuario
+from utils.decorators import admin_required
 import secrets
 from datetime import datetime, timedelta
 
@@ -68,6 +70,9 @@ def login():
 
     if not usuario or not usuario.check_password(password):
         return jsonify({"ok": False, "error": "Email o contraseña incorrectos"}), 401
+
+    if not usuario.activo:
+        return jsonify({"ok": False, "error": "Tu cuenta ha sido desactivada. Contactá al administrador."}), 403
 
     # Crear token JWT — el identity es el ID del usuario como string
     access_token = create_access_token(identity=str(usuario.id))
@@ -176,3 +181,77 @@ def reset_password():
     usuario.save()
 
     return jsonify({"ok": True, "mensaje": "Contraseña actualizada correctamente"}), 200
+
+
+# ─── ABM de Usuarios (solo admin) ────────────────────────────────────────────
+
+@auth_bp.get("/usuarios")
+@admin_required
+def listar_usuarios():
+    """
+    GET /api/auth/usuarios — lista todos los usuarios (requiere JWT admin).
+    El admin que hace la consulta no se incluye en la lista para evitar auto-gestión.
+    """
+    user_id = get_jwt_identity()
+    usuarios = Usuario.objects(id__ne=user_id).order_by("nombre")
+    return jsonify({
+        "ok": True,
+        "total": usuarios.count(),
+        "usuarios": [u.to_dict() for u in usuarios]
+    }), 200
+
+
+@auth_bp.put("/usuarios/<usuario_id>")
+@admin_required
+def editar_usuario(usuario_id):
+    """
+    PUT /api/auth/usuarios/<id> — edita nombre y/o rol de un usuario (requiere JWT admin).
+    Body JSON: { "nombre": "...", "es_admin": true/false }
+    """
+    try:
+        usuario = Usuario.objects(id=usuario_id).first()
+    except InvalidId:
+        return jsonify({"ok": False, "error": "ID inválido"}), 400
+
+    if not usuario:
+        return jsonify({"ok": False, "error": "Usuario no encontrado"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"ok": False, "error": "Body JSON requerido"}), 400
+
+    nombre = data.get("nombre", "").strip()
+    if not nombre:
+        return jsonify({"ok": False, "error": "El campo 'nombre' es requerido"}), 400
+
+    usuario.nombre   = nombre
+    usuario.es_admin = bool(data.get("es_admin", usuario.es_admin))
+    usuario.save()
+
+    return jsonify({"ok": True, "usuario": usuario.to_dict()}), 200
+
+
+@auth_bp.patch("/usuarios/<usuario_id>/estado")
+@admin_required
+def toggle_estado_usuario(usuario_id):
+    """
+    PATCH /api/auth/usuarios/<id>/estado — activa o desactiva un usuario (baja lógica).
+    Body JSON: { "activo": true/false }
+    """
+    try:
+        usuario = Usuario.objects(id=usuario_id).first()
+    except InvalidId:
+        return jsonify({"ok": False, "error": "ID inválido"}), 400
+
+    if not usuario:
+        return jsonify({"ok": False, "error": "Usuario no encontrado"}), 404
+
+    data = request.get_json()
+    if data is None or "activo" not in data:
+        return jsonify({"ok": False, "error": "El campo 'activo' es requerido"}), 400
+
+    usuario.activo = bool(data["activo"])
+    usuario.save()
+
+    estado = "activado" if usuario.activo else "desactivado"
+    return jsonify({"ok": True, "mensaje": f"Usuario {estado} correctamente", "usuario": usuario.to_dict()}), 200

@@ -7,6 +7,7 @@ class Usuario(Document):
     email                = EmailField(required=True, unique=True)
     password_hash        = StringField(required=True)
     es_admin             = BooleanField(default=False)
+    activo               = BooleanField(default=True)   # False = baja lógica del usuario
     created_at           = DateTimeField(default=datetime.utcnow)
     reset_token          = StringField(default=None)
     reset_token_expires  = DateTimeField(default=None)
@@ -27,5 +28,6 @@ class Usuario(Document):
             "nombre": self.nombre,
             "email": self.email,
             "es_admin": self.es_admin,
+            "activo": self.activo,
             "created_at": self.created_at.isoformat()
         }
