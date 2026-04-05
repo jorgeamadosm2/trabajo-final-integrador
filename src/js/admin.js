@@ -484,3 +484,61 @@ function formatearFecha(isoString) {
     return fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
         + " " + fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 }
+
+// ─── Exportación CSV ──────────────────────────────────────────────────────────
+
+/**
+ * Genera y descarga un archivo CSV a partir de un array de filas.
+ * La primera fila debe ser el array de encabezados.
+ * Incluye BOM UTF-8 para compatibilidad con Excel (tildes y ñ).
+ */
+function exportarCSV(filas, nombreArchivo) {
+    const contenido = filas
+        .map(fila => fila.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+    const blob = new Blob(["\uFEFF" + contenido], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement("a"), { href: url, download: nombreArchivo });
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportarProductos() {
+    if (!todosLosProductos.length) { alert("No hay productos cargados para exportar."); return; }
+    const fecha = new Date().toISOString().slice(0, 10);
+    const filas = [
+        ["Nombre", "Descripción", "Precio (ARS)", "Unidad", "Categoría", "Etiqueta", "Destacado", "Activo", "Fecha de creación"],
+        ...todosLosProductos.map(p => [
+            p.nombre, p.descripcion ?? "", p.precio, p.unidad ?? "",
+            p.categoria, p.etiqueta ?? "", p.destacado ? "Sí" : "No",
+            p.activo ? "Sí" : "No", formatearFecha(p.created_at)
+        ])
+    ];
+    exportarCSV(filas, `productos_${fecha}.csv`);
+}
+
+function exportarMensajes() {
+    if (!todosMensajes.length) { alert("No hay mensajes cargados para exportar."); return; }
+    const fecha = new Date().toISOString().slice(0, 10);
+    const filas = [
+        ["Nombre", "Email", "Asunto", "Mensaje", "Leído", "Fecha de envío"],
+        ...todosMensajes.map(m => [
+            m.nombre, m.email, m.asunto, m.mensaje,
+            m.leido ? "Sí" : "No", formatearFecha(m.created_at)
+        ])
+    ];
+    exportarCSV(filas, `mensajes_${fecha}.csv`);
+}
+
+function exportarUsuarios() {
+    if (!todosUsuarios.length) { alert("No hay usuarios cargados para exportar."); return; }
+    const fecha = new Date().toISOString().slice(0, 10);
+    const filas = [
+        ["Nombre", "Email", "Administrador", "Activo", "Fecha de registro"],
+        ...todosUsuarios.map(u => [
+            u.nombre, u.email, u.es_admin ? "Sí" : "No",
+            u.activo ? "Sí" : "No", formatearFecha(u.created_at)
+        ])
+    ];
+    exportarCSV(filas, `usuarios_${fecha}.csv`);
+}

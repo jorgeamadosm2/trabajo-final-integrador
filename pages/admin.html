@@ -89,9 +89,10 @@
                 <!-- Botón agregar -->
                 <div class="admin__barra-acciones">
                     <h2 class="admin__seccion-titulo">Gestión de Productos</h2>
-                    <button class="boton boton--primario admin__boton-agregar" onclick="toggleFormulario()">
-                        + Agregar Producto
-                    </button>
+                    <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                        <button class="boton boton--contorno" onclick="exportarProductos()">⬇ Exportar CSV</button>
+                        <button class="boton boton--primario admin__boton-agregar" onclick="toggleFormulario()">+ Agregar Producto</button>
+                    </div>
                 </div>
 
                 <!-- Formulario agregar/editar (oculto por defecto) -->
@@ -185,9 +186,12 @@
 
                 <div class="admin__barra-acciones">
                     <h2 class="admin__seccion-titulo">Mensajes de Contacto</h2>
-                    <div class="admin__filtros-mensajes">
-                        <button class="admin__filtro admin__filtro--activo" onclick="filtrarMensajes(this, 'todos')">Todos</button>
-                        <button class="admin__filtro" onclick="filtrarMensajes(this, 'no_leidos')">Sin leer</button>
+                    <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+                        <div class="admin__filtros-mensajes">
+                            <button class="admin__filtro admin__filtro--activo" onclick="filtrarMensajes(this, 'todos')">Todos</button>
+                            <button class="admin__filtro" onclick="filtrarMensajes(this, 'no_leidos')">Sin leer</button>
+                        </div>
+                        <button class="boton boton--contorno" onclick="exportarMensajes()">⬇ Exportar CSV</button>
                     </div>
                 </div>
 
@@ -202,6 +206,7 @@
 
                 <div class="admin__barra-acciones">
                     <h2 class="admin__seccion-titulo">Gestión de Usuarios</h2>
+                    <button class="boton boton--contorno" onclick="exportarUsuarios()">⬇ Exportar CSV</button>
                 </div>
 
                 <!-- Formulario de edición de usuario (oculto por defecto) -->
