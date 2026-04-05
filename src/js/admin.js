@@ -7,6 +7,7 @@
 let todosLosProductos = [];  // cache de productos cargados
 let filtroCategoriaActual = "";
 let modoEdicion = false;     // false = agregar, true = editar
+let todosUsuarios = [];      // cache de usuarios cargados
 
 // ─── Inicialización ───────────────────────────────────────────────────────────
 
@@ -18,17 +19,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Cargar datos en paralelo
-    await Promise.all([cargarProductos(), cargarMensajes()]);
+    await Promise.all([cargarProductos(), cargarMensajes(), cargarUsuarios()]);
 
     // Listener del formulario de producto
     document.getElementById("formProducto").addEventListener("submit", guardarProducto);
+
+    // Listener del formulario de edición de usuario
+    document.getElementById("formUsuario").addEventListener("submit", guardarUsuario);
 });
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 function mostrarTab(tab) {
-    const secciones = { productos: "seccionProductos", mensajes: "seccionMensajes" };
-    const tabs      = { productos: "tabProductos",     mensajes: "tabMensajes" };
+    const secciones = {
+        productos: "seccionProductos",
+        mensajes:  "seccionMensajes",
+        usuarios:  "seccionUsuarios"
+    };
+    const tabs = {
+        productos: "tabProductos",
+        mensajes:  "tabMensajes",
+        usuarios:  "tabUsuarios"
+    };
 
     Object.entries(secciones).forEach(([key, id]) => {
         document.getElementById(id).style.display = key === tab ? "block" : "none";
@@ -279,7 +291,7 @@ function renderizarMensajes(mensajes) {
     };
 
     contenedor.innerHTML = mensajes.map(m => `
-        <div class="admin__mensaje ${!m.leido ? "admin__mensaje--nuevo" : ""}">
+        <div class="admin__mensaje ${!m.leido ? "admin__mensaje--nuevo" : ""}" id="msg-${m.id}">
             <div class="admin__mensaje-cabecera">
                 <div class="admin__mensaje-origen">
                     <span class="admin__mensaje-nombre">${m.nombre}</span>
@@ -292,10 +304,13 @@ function renderizarMensajes(mensajes) {
                 </div>
             </div>
             <p class="admin__mensaje-texto">${m.mensaje}</p>
-            ${!m.leido
-                ? `<button class="admin__btn admin__btn--leido" onclick="marcarLeido('${m.id}', this)">✓ Marcar como leído</button>`
-                : `<span class="admin__mensaje-leido">✓ Leído</span>`
-            }
+            <div class="admin__fila-acciones">
+                ${!m.leido
+                    ? `<button class="admin__btn admin__btn--leido" onclick="marcarLeido('${m.id}', this)">✓ Marcar como leído</button>`
+                    : `<span class="admin__mensaje-leido">✓ Leído</span>`
+                }
+                <button class="admin__btn admin__btn--eliminar" onclick="eliminarMensaje('${m.id}')">🗑 Eliminar</button>
+            </div>
         </div>
     `).join("");
 }
@@ -325,6 +340,138 @@ async function marcarLeido(id, btn) {
         } else {
             badge.style.display = "none";
         }
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
+
+async function eliminarMensaje(id) {
+    if (!confirm("¿Seguro que querés eliminar este mensaje? Esta acción no se puede deshacer.")) return;
+    try {
+        await apiFetch(`/contacto/${id}`, { method: "DELETE" });
+        // Quitar del cache y del DOM
+        todosMensajes = todosMensajes.filter(m => m.id !== id);
+        document.getElementById(`msg-${id}`)?.remove();
+
+        // Actualizar contador
+        const noLeidos = todosMensajes.filter(m => !m.leido).length;
+        document.getElementById("statMensajes").textContent = noLeidos;
+        const badge = document.getElementById("badgeMensajes");
+        badge.textContent = noLeidos;
+        if (noLeidos === 0) badge.style.display = "none";
+
+        if (!todosMensajes.length) {
+            document.getElementById("listaMensajes").innerHTML =
+                `<p class="admin__vacio">No hay mensajes para mostrar.</p>`;
+        }
+    } catch (e) {
+        alert("Error al eliminar: " + e.message);
+    }
+}
+
+// ─── USUARIOS ─────────────────────────────────────────────────────────────────
+
+async function cargarUsuarios() {
+    try {
+        const datos = await apiFetch("/auth/usuarios");
+        todosUsuarios = datos.usuarios;
+        document.getElementById("statUsuarios").textContent = todosUsuarios.length;
+        renderizarUsuarios(todosUsuarios);
+    } catch (e) {
+        document.getElementById("listaUsuarios").innerHTML =
+            `<p style="color:red;padding:1rem;">Error al cargar usuarios: ${e.message}</p>`;
+    }
+}
+
+function renderizarUsuarios(usuarios) {
+    const contenedor = document.getElementById("listaUsuarios");
+
+    if (!usuarios.length) {
+        contenedor.innerHTML = `<p class="admin__vacio">No hay otros usuarios registrados.</p>`;
+        return;
+    }
+
+    const filas = usuarios.map(u => `
+        <div class="admin__fila ${!u.activo ? "admin__fila--inactiva" : ""}" id="usr-${u.id}">
+            <div class="admin__fila-info">
+                <span class="admin__fila-nombre">${u.nombre}</span>
+                <span class="admin__fila-meta">
+                    <span class="admin__badge ${u.es_admin ? "admin__badge--destacado" : "admin__badge--etiqueta"}">
+                        ${u.es_admin ? "Admin" : "Usuario"}
+                    </span>
+                    ${!u.activo ? `<span class="admin__badge admin__badge--inactivo">Inactivo</span>` : ""}
+                    <span style="font-size:.8rem;color:#888;">${u.email}</span>
+                </span>
+            </div>
+            <div class="admin__fila-acciones">
+                <button class="admin__btn admin__btn--editar" onclick="abrirEditarUsuario(${JSON.stringify(u).replace(/"/g, "&quot;")})">
+                    ✏ Editar
+                </button>
+                <button class="admin__btn ${u.activo ? "admin__btn--eliminar" : "admin__btn--restaurar"}"
+                    onclick="toggleEstadoUsuario('${u.id}', ${u.activo})">
+                    ${u.activo ? "🚫 Dar de baja" : "✔ Reactivar"}
+                </button>
+            </div>
+        </div>
+    `).join("");
+
+    contenedor.innerHTML = `<div class="admin__tabla">${filas}</div>`;
+}
+
+function abrirEditarUsuario(usuario) {
+    document.getElementById("usuarioEditId").value = usuario.id;
+    document.getElementById("uNombre").value        = usuario.nombre;
+    document.getElementById("uEsAdmin").checked     = usuario.es_admin;
+    document.getElementById("formUsuarioError").style.display = "none";
+
+    const form = document.getElementById("formularioUsuario");
+    form.style.display = "block";
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function cancelarFormUsuario() {
+    document.getElementById("formularioUsuario").style.display = "none";
+    document.getElementById("formUsuario").reset();
+}
+
+async function guardarUsuario(e) {
+    e.preventDefault();
+    const errorDiv  = document.getElementById("formUsuarioError");
+    const btnGuardar = document.getElementById("btnGuardarUsuario");
+    errorDiv.style.display = "none";
+
+    const id      = document.getElementById("usuarioEditId").value;
+    const payload = {
+        nombre:   document.getElementById("uNombre").value.trim(),
+        es_admin: document.getElementById("uEsAdmin").checked,
+    };
+
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = "Guardando...";
+
+    try {
+        await apiFetch(`/auth/usuarios/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+        cancelarFormUsuario();
+        await cargarUsuarios();
+    } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = "block";
+    } finally {
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = "Guardar cambios";
+    }
+}
+
+async function toggleEstadoUsuario(id, estadoActual) {
+    const accion = estadoActual ? "dar de baja" : "reactivar";
+    if (!confirm(`¿Seguro que querés ${accion} a este usuario?`)) return;
+
+    try {
+        await apiFetch(`/auth/usuarios/${id}/estado`, {
+            method: "PATCH",
+            body: JSON.stringify({ activo: !estadoActual })
+        });
+        await cargarUsuarios();
     } catch (e) {
         alert("Error: " + e.message);
     }

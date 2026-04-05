@@ -83,3 +83,19 @@ def marcar_leido(mensaje_id):
     mensaje.leido = True
     mensaje.save()
     return jsonify({"ok": True, "mensaje": mensaje.to_dict()}), 200
+
+
+@contacto_bp.delete("/<mensaje_id>")
+@admin_required
+def eliminar_mensaje(mensaje_id):
+    """DELETE /api/contacto/<id> — elimina definitivamente un mensaje (requiere JWT admin)."""
+    try:
+        mensaje = MensajeContacto.objects(id=mensaje_id).first()
+    except InvalidId:
+        return jsonify({"ok": False, "error": "ID inválido"}), 400
+
+    if not mensaje:
+        return jsonify({"ok": False, "error": "Mensaje no encontrado"}), 404
+
+    mensaje.delete()
+    return jsonify({"ok": True, "mensaje": "Mensaje eliminado correctamente"}), 200

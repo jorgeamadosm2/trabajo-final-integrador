@@ -97,6 +97,9 @@ def obtener_producto(producto_id):
 @admin_required
 def crear_producto():
     """POST /api/productos — crea un nuevo producto (requiere JWT admin)."""
+    from flask_jwt_extended import get_jwt_identity
+    from models import Usuario
+
     data = request.get_json()
     if not data:
         return jsonify({"ok": False, "error": "Body JSON requerido"}), 400
@@ -104,6 +107,9 @@ def crear_producto():
     errores = _validar_producto(data)
     if errores:
         return jsonify({"ok": False, "errores": errores}), 400
+
+    # Obtener el admin que está creando el producto (relación FK explícita)
+    admin = Usuario.objects(id=get_jwt_identity()).first()
 
     producto = Producto(
         nombre      = data["nombre"].strip(),
@@ -114,6 +120,7 @@ def crear_producto():
         imagen_url  = data.get("imagen_url"),
         etiqueta    = data.get("etiqueta"),
         destacado   = bool(data.get("destacado", False)),
+        creado_por  = admin,
     )
     producto.save()
     return jsonify({"ok": True, "producto": producto.to_dict()}), 201
