@@ -1,4 +1,4 @@
-from mongoengine import (Document, StringField, FloatField,
+from mongoengine import (Document, StringField, FloatField, IntField,
                          BooleanField, DateTimeField, ReferenceField)
 from datetime import datetime
 
@@ -14,6 +14,7 @@ class Producto(Document):
     etiqueta    = StringField(max_length=30)    # "Nuevo", "Popular", None
     destacado   = BooleanField(default=False)   # aparece en la sección de index.html
     activo      = BooleanField(default=True)    # False = soft-delete (no se borra de Atlas)
+    stock       = IntField(min_value=0)         # None = sin control de stock
     creado_por  = ReferenceField("Usuario", null=True)  # FK → Usuario admin que lo creó
     created_at  = DateTimeField(default=datetime.utcnow)
     updated_at  = DateTimeField(default=datetime.utcnow)
@@ -32,6 +33,7 @@ class Producto(Document):
             "etiqueta": self.etiqueta,
             "destacado": self.destacado,
             "activo": self.activo,
+            "stock": self.stock,
             "creado_por_id": str(self.creado_por.id) if self.creado_por else None,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()

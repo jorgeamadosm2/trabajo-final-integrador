@@ -19,6 +19,8 @@ function renderizarCard(producto) {
     ? `<div class="${claseEtiqueta}">${producto.etiqueta}</div>`
     : "";
 
+  const sinStock = producto.stock !== null && producto.stock !== undefined && producto.stock === 0;
+
   // Formatear el precio con puntos (ej: 18.500)
   const precioFormateado = producto.precio.toLocaleString("es-AR");
   const unidad = producto.unidad ? ` /${producto.unidad}` : "";
@@ -33,11 +35,12 @@ function renderizarCard(producto) {
   return `
     <div class="tarjeta-producto" data-categoria="${producto.categoria}">
       ${etiquetaHTML}
+      ${sinStock ? `<div class="tarjeta-producto__etiqueta tarjeta-producto__etiqueta--sin-stock">Sin stock</div>` : ""}
       <div class="tarjeta-producto__contenedor-img">
         <img
           src="${imagenSrc}"
           alt="${producto.nombre}"
-          class="tarjeta-producto__imagen"
+          class="tarjeta-producto__imagen${sinStock ? " tarjeta-producto__imagen--sin-stock" : ""}"
           loading="lazy"
         >
       </div>
@@ -47,13 +50,16 @@ function renderizarCard(producto) {
         <div class="tarjeta-producto__pie">
           <span class="tarjeta-producto__precio">$${precioFormateado}${unidad}</span>
           <div class="tarjeta-producto__acciones">
-            <button
-              class="tarjeta-producto__boton-carrito"
-              data-id="${producto.id}"
-              data-nombre="${producto.nombre}"
-              data-precio="${producto.precio}"
-              data-unidad="${producto.unidad || ''}"
-            >🛒 Agregar</button>
+            ${sinStock
+              ? `<button class="tarjeta-producto__boton-carrito" disabled>Sin stock</button>`
+              : `<button
+                  class="tarjeta-producto__boton-carrito"
+                  data-id="${producto.id}"
+                  data-nombre="${producto.nombre}"
+                  data-precio="${producto.precio}"
+                  data-unidad="${producto.unidad || ''}"
+                >🛒 Agregar</button>`
+            }
             <a href="${rutaContacto}" class="tarjeta-producto__boton">Consultar</a>
           </div>
         </div>

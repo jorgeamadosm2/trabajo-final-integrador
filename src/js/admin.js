@@ -94,6 +94,11 @@ function renderizarTablaProductos(productos) {
                     <span class="admin__badge admin__badge--${p.categoria}">${labelCategoria(p.categoria)}</span>
                     ${p.etiqueta ? `<span class="admin__badge admin__badge--etiqueta">${p.etiqueta}</span>` : ""}
                     ${p.destacado ? `<span class="admin__badge admin__badge--destacado">⭐ Destacado</span>` : ""}
+                    ${p.stock !== null && p.stock !== undefined
+                        ? p.stock === 0
+                            ? `<span class="admin__badge admin__badge--sin-stock">Sin stock</span>`
+                            : `<span class="admin__badge admin__badge--stock">Stock: ${p.stock}</span>`
+                        : ""}
                     ${!p.activo ? `<span class="admin__badge admin__badge--inactivo">Inactivo</span>` : ""}
                 </span>
             </div>
@@ -171,6 +176,7 @@ function abrirEditar(producto) {
     document.getElementById("pEtiqueta").value       = producto.etiqueta || "";
     document.getElementById("pDestacado").checked    = producto.destacado;
     document.getElementById("pActivo").checked       = producto.activo;
+    document.getElementById("pStock").value          = producto.stock !== null && producto.stock !== undefined ? producto.stock : "";
     document.getElementById("checkActivoLabel").style.display = "flex";
     document.getElementById("formError").style.display = "none";
 
@@ -185,6 +191,7 @@ async function guardarProducto(e) {
     const btnGuardar = document.getElementById("btnGuardar");
     errorDiv.style.display = "none";
 
+    const stockVal = document.getElementById("pStock").value;
     const payload = {
         nombre:      document.getElementById("pNombre").value.trim(),
         precio:      parseFloat(document.getElementById("pPrecio").value),
@@ -194,6 +201,7 @@ async function guardarProducto(e) {
         imagen_url:  document.getElementById("pImagenUrl").value.trim() || null,
         etiqueta:    document.getElementById("pEtiqueta").value || null,
         destacado:   document.getElementById("pDestacado").checked,
+        stock:       stockVal !== "" ? parseInt(stockVal) : null,
     };
 
     if (modoEdicion) {
@@ -611,10 +619,11 @@ function exportarProductos() {
     if (!todosLosProductos.length) { alert("No hay productos cargados para exportar."); return; }
     const fecha = new Date().toISOString().slice(0, 10);
     const filas = [
-        ["Nombre", "Descripción", "Precio (ARS)", "Unidad", "Categoría", "Etiqueta", "Destacado", "Activo", "Fecha de creación"],
+        ["Nombre", "Descripción", "Precio (ARS)", "Unidad", "Categoría", "Etiqueta", "Destacado", "Stock", "Activo", "Fecha de creación"],
         ...todosLosProductos.map(p => [
             p.nombre, p.descripcion ?? "", p.precio, p.unidad ?? "",
             p.categoria, p.etiqueta ?? "", p.destacado ? "Sí" : "No",
+            p.stock !== null && p.stock !== undefined ? p.stock : "Sin límite",
             p.activo ? "Sí" : "No", formatearFecha(p.created_at)
         ])
     ];
