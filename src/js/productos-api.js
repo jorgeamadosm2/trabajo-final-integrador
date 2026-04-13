@@ -26,6 +26,10 @@ function renderizarCard(producto) {
   // La ruta de la imagen viene de la API relativa a la carpeta pages/
   const imagenSrc = producto.imagen_url || "../src/img/materia-prima.png";
 
+  // Ruta a contacto según en qué página estamos
+  const esRaiz = !window.location.pathname.includes('/pages/');
+  const rutaContacto = esRaiz ? "pages/contacto.html" : "contacto.html";
+
   return `
     <div class="tarjeta-producto" data-categoria="${producto.categoria}">
       ${etiquetaHTML}
@@ -42,7 +46,16 @@ function renderizarCard(producto) {
         <p class="tarjeta-producto__descripcion">${producto.descripcion || ""}</p>
         <div class="tarjeta-producto__pie">
           <span class="tarjeta-producto__precio">$${precioFormateado}${unidad}</span>
-          <a href="contacto.html" class="tarjeta-producto__boton">Consultar</a>
+          <div class="tarjeta-producto__acciones">
+            <button
+              class="tarjeta-producto__boton-carrito"
+              data-id="${producto.id}"
+              data-nombre="${producto.nombre}"
+              data-precio="${producto.precio}"
+              data-unidad="${producto.unidad || ''}"
+            >🛒 Agregar</button>
+            <a href="${rutaContacto}" class="tarjeta-producto__boton">Consultar</a>
+          </div>
         </div>
       </div>
     </div>
