@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -91,6 +92,9 @@
 
             <!-- Tabs de navegación -->
             <div class="admin__tabs">
+                <button class="admin__tab" id="tabDashboard" onclick="mostrarTab('dashboard')">
+                    📊 Dashboard
+                </button>
                 <button class="admin__tab admin__tab--activo" id="tabProductos" onclick="mostrarTab('productos')">
                     📦 Productos
                 </button>
@@ -106,6 +110,84 @@
                     <span class="admin__tab-badge" id="badgePedidos" style="display:none;">0</span>
                 </button>
             </div>
+
+            <!-- ══════════ TAB: DASHBOARD ══════════ -->
+            <section id="seccionDashboard" class="admin__seccion" style="display:none;">
+
+                <div class="admin__barra-acciones">
+                    <h2 class="admin__seccion-titulo">Dashboard</h2>
+                    <span class="dash__actualizacion">Datos del período actual</span>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="dash__kpis">
+                    <div class="dash__kpi">
+                        <span class="dash__kpi-icono">💰</span>
+                        <div class="dash__kpi-contenido">
+                            <span class="dash__kpi-valor" id="dashIngresosTotal">—</span>
+                            <span class="dash__kpi-label">Ingresos totales</span>
+                        </div>
+                    </div>
+                    <div class="dash__kpi">
+                        <span class="dash__kpi-icono">📅</span>
+                        <div class="dash__kpi-contenido">
+                            <span class="dash__kpi-valor" id="dashIngresosMes">—</span>
+                            <span class="dash__kpi-label">Ingresos este mes</span>
+                        </div>
+                    </div>
+                    <div class="dash__kpi">
+                        <span class="dash__kpi-icono">🛒</span>
+                        <div class="dash__kpi-contenido">
+                            <span class="dash__kpi-valor" id="dashPedidosMes">—</span>
+                            <span class="dash__kpi-label">Pedidos este mes</span>
+                        </div>
+                    </div>
+                    <div class="dash__kpi">
+                        <span class="dash__kpi-icono">📈</span>
+                        <div class="dash__kpi-contenido">
+                            <span class="dash__kpi-valor" id="dashTicketPromedio">—</span>
+                            <span class="dash__kpi-label">Ticket promedio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila 1: Ingresos por mes + Ventas por categoría -->
+                <div class="dash__fila">
+                    <div class="dash__card dash__card--grande">
+                        <h3 class="dash__card-titulo">Ingresos por mes — últimos 6 meses</h3>
+                        <canvas id="chartIngresos" height="120"></canvas>
+                    </div>
+                    <div class="dash__card">
+                        <h3 class="dash__card-titulo">Ventas por categoría</h3>
+                        <canvas id="chartCategorias"></canvas>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Top productos + Mensajes por asunto -->
+                <div class="dash__fila">
+                    <div class="dash__card">
+                        <h3 class="dash__card-titulo">Top 5 productos más vendidos</h3>
+                        <div id="dashTopProductos"><p class="admin__cargando">Calculando...</p></div>
+                    </div>
+                    <div class="dash__card">
+                        <h3 class="dash__card-titulo">Consultas por asunto</h3>
+                        <canvas id="chartMensajes"></canvas>
+                    </div>
+                </div>
+
+                <!-- Fila 3: Pedidos recientes + Stock crítico -->
+                <div class="dash__fila dash__fila--igual">
+                    <div class="dash__card">
+                        <h3 class="dash__card-titulo">Pedidos recientes</h3>
+                        <div id="dashPedidosRecientes"><p class="admin__cargando">Cargando...</p></div>
+                    </div>
+                    <div class="dash__card">
+                        <h3 class="dash__card-titulo">Stock crítico</h3>
+                        <div id="dashStockCritico"><p class="admin__cargando">Calculando...</p></div>
+                    </div>
+                </div>
+
+            </section>
 
             <!-- ══════════ TAB: PRODUCTOS ══════════ -->
             <section id="seccionProductos" class="admin__seccion">

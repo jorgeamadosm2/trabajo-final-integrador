@@ -33,12 +33,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function mostrarTab(tab) {
     const secciones = {
+        dashboard: "seccionDashboard",
         productos: "seccionProductos",
         mensajes:  "seccionMensajes",
         usuarios:  "seccionUsuarios",
         pedidos:   "seccionPedidos"
     };
     const tabs = {
+        dashboard: "tabDashboard",
         productos: "tabProductos",
         mensajes:  "tabMensajes",
         usuarios:  "tabUsuarios",
@@ -52,10 +54,16 @@ function mostrarTab(tab) {
         document.getElementById(id).classList.toggle("admin__tab--activo", key === tab);
     });
 
+    // El dashboard tiene sus propios KPIs: ocultar el banner de stats
+    document.getElementById("adminStats").style.display = tab === "dashboard" ? "none" : "";
+
     // Mostrar solo las stats correspondientes a la tab activa
     document.querySelectorAll("#adminStats .admin__stat[data-tab]").forEach(el => {
         el.style.display = el.dataset.tab === tab ? "" : "none";
     });
+
+    // Renderizar el dashboard al entrar en esa tab
+    if (tab === "dashboard") renderizarDashboard();
 }
 
 // ─── PRODUCTOS ────────────────────────────────────────────────────────────────
@@ -597,6 +605,183 @@ async function eliminarPedido(id, numero) {
     } catch (e) {
         alert("Error al eliminar: " + e.message);
     }
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+
+function renderizarDashboard() {
+    const ahora      = new Date();
+    const mesActual  = ahora.getMonth();
+    const anioActual = ahora.getFullYear();
+
+    // ── KPIs ──────────────────────────────────────────────────────────────────
+    const ingresosTotal  = todosPedidos.reduce((s, p) => s + p.total, 0);
+    const pedidosMes     = todosPedidos.filter(p => {
+        const f = new Date(p.created_at);
+        return f.getMonth() === mesActual && f.getFullYear() === anioActual;
+    });
+    const ingresosMes    = pedidosMes.reduce((s, p) => s + p.total, 0);
+    const ticketPromedio = todosPedidos.length ? ingresosTotal / todosPedidos.length : 0;
+
+    document.getElementById("dashIngresosTotal").textContent  = "$" + Math.round(ingresosTotal).toLocaleString("es-AR");
+    document.getElementById("dashIngresosMes").textContent    = "$" + Math.round(ingresosMes).toLocaleString("es-AR");
+    document.getElementById("dashPedidosMes").textContent     = pedidosMes.length;
+    document.getElementById("dashTicketPromedio").textContent = "$" + Math.round(ticketPromedio).toLocaleString("es-AR");
+
+    // ── Gráfico: ingresos por mes (últimos 6 meses) ───────────────────────────
+    const labelesMeses = [];
+    const datosIngresos = [];
+    for (let i = 5; i >= 0; i--) {
+        const fecha = new Date(anioActual, mesActual - i, 1);
+        const m = fecha.getMonth();
+        const a = fecha.getFullYear();
+        labelesMeses.push(fecha.toLocaleDateString("es-AR", { month: "short", year: "2-digit" }));
+        datosIngresos.push(
+            todosPedidos
+                .filter(p => { const f = new Date(p.created_at); return f.getMonth() === m && f.getFullYear() === a; })
+                .reduce((s, p) => s + p.total, 0)
+        );
+    }
+
+    if (window._chartIngresos) window._chartIngresos.destroy();
+    window._chartIngresos = new Chart(document.getElementById("chartIngresos"), {
+        type: "bar",
+        data: {
+            labels: labelesMeses,
+            datasets: [{
+                label: "Ingresos ARS",
+                data: datosIngresos,
+                backgroundColor: "#7A3B1E",
+                borderRadius: 6,
+                hoverBackgroundColor: "#4E2410",
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => "$" + v.toLocaleString("es-AR") }
+                }
+            }
+        }
+    });
+
+    // ── Gráfico: ventas por categoría ─────────────────────────────────────────
+    const ingresosCat = { "materia-prima": 0, "elaborados": 0, "herramientas": 0 };
+    todosPedidos.forEach(p => {
+        p.items.forEach(item => {
+            const prod = todosLosProductos.find(pr => pr.id === item.producto_id);
+            if (prod && ingresosCat[prod.categoria] !== undefined) {
+                ingresosCat[prod.categoria] += (item.subtotal ?? item.precio * item.cantidad);
+            }
+        });
+    });
+
+    if (window._chartCategorias) window._chartCategorias.destroy();
+    window._chartCategorias = new Chart(document.getElementById("chartCategorias"), {
+        type: "doughnut",
+        data: {
+            labels: ["Materia Prima", "Elaborados", "Herramientas"],
+            datasets: [{
+                data: [ingresosCat["materia-prima"], ingresosCat["elaborados"], ingresosCat["herramientas"]],
+                backgroundColor: ["#7A3B1E", "#C9A84C", "#5c8b3a"],
+                borderWidth: 2,
+                borderColor: "#fff",
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom", labels: { boxWidth: 12, padding: 14 } } },
+            cutout: "60%",
+        }
+    });
+
+    // ── Top 5 productos más vendidos ──────────────────────────────────────────
+    const conteo = {};
+    todosPedidos.forEach(p => {
+        p.items.forEach(item => {
+            if (!conteo[item.nombre]) conteo[item.nombre] = { cantidad: 0, ingresos: 0 };
+            conteo[item.nombre].cantidad += item.cantidad;
+            conteo[item.nombre].ingresos += (item.subtotal ?? item.precio * item.cantidad);
+        });
+    });
+    const top5 = Object.entries(conteo)
+        .sort((a, b) => b[1].ingresos - a[1].ingresos)
+        .slice(0, 5);
+    const maxIngreso = top5[0]?.[1].ingresos || 1;
+
+    document.getElementById("dashTopProductos").innerHTML = top5.length
+        ? top5.map(([nombre, d], i) => `
+            <div class="dash__top-fila">
+                <span class="dash__top-pos">${i + 1}</span>
+                <div class="dash__top-info">
+                    <span class="dash__top-nombre" title="${nombre}">${nombre}</span>
+                    <div class="dash__top-barra-bg">
+                        <div class="dash__top-barra" style="width:${((d.ingresos / maxIngreso) * 100).toFixed(0)}%"></div>
+                    </div>
+                </div>
+                <span class="dash__top-valor">$${Math.round(d.ingresos).toLocaleString("es-AR")}</span>
+            </div>`).join("")
+        : `<p class="admin__vacio">Sin ventas registradas.</p>`;
+
+    // ── Gráfico: mensajes por asunto ──────────────────────────────────────────
+    const asuntos = { consulta: 0, mayorista: 0, pedido: 0, otro: 0 };
+    todosMensajes.forEach(m => { if (asuntos[m.asunto] !== undefined) asuntos[m.asunto]++; });
+
+    if (window._chartMensajes) window._chartMensajes.destroy();
+    window._chartMensajes = new Chart(document.getElementById("chartMensajes"), {
+        type: "doughnut",
+        data: {
+            labels: ["Consulta", "Mayorista", "Pedido", "Otro"],
+            datasets: [{
+                data: [asuntos.consulta, asuntos.mayorista, asuntos.pedido, asuntos.otro],
+                backgroundColor: ["#7A3B1E", "#C9A84C", "#5c8b3a", "#9A9A9A"],
+                borderWidth: 2,
+                borderColor: "#fff",
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom", labels: { boxWidth: 12, padding: 14 } } },
+            cutout: "60%",
+        }
+    });
+
+    // ── Pedidos recientes (últimos 5) ─────────────────────────────────────────
+    const recientes = [...todosPedidos]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+
+    document.getElementById("dashPedidosRecientes").innerHTML = recientes.length
+        ? recientes.map(p => `
+            <div class="dash__pedido-reciente">
+                <span class="dash__pedido-num">${p.numero}</span>
+                <span class="dash__pedido-usuario">${p.usuario_nombre || "—"}</span>
+                <span class="admin__badge ${p.estado === "pendiente" ? "admin__badge--pendiente" : "admin__badge--procesado"}">
+                    ${p.estado === "pendiente" ? "⏳ Pendiente" : "✓ Procesado"}
+                </span>
+                <span class="dash__pedido-total">$${Math.round(p.total).toLocaleString("es-AR")}</span>
+                <span class="dash__pedido-fecha">${formatearFecha(p.created_at)}</span>
+            </div>`).join("")
+        : `<p class="admin__vacio">No hay pedidos registrados.</p>`;
+
+    // ── Stock crítico (stock === 0 o stock <= 5) ──────────────────────────────
+    const criticos = todosLosProductos
+        .filter(p => p.activo && p.stock !== null && p.stock !== undefined && p.stock <= 5)
+        .sort((a, b) => a.stock - b.stock)
+        .slice(0, 8);
+
+    document.getElementById("dashStockCritico").innerHTML = criticos.length
+        ? criticos.map(p => `
+            <div class="dash__stock-fila">
+                <span class="dash__stock-nombre" title="${p.nombre}">${p.nombre}</span>
+                <span class="dash__stock-cantidad ${p.stock === 0 ? "dash__stock-cantidad--cero" : "dash__stock-cantidad--bajo"}">
+                    ${p.stock === 0 ? "Sin stock" : `${p.stock} uds.`}
+                </span>
+            </div>`).join("")
+        : `<p class="admin__vacio">No hay productos con stock crítico.</p>`;
 }
 
 // ─── Utilidades ───────────────────────────────────────────────────────────────
