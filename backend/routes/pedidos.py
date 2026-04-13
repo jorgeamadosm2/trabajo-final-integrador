@@ -14,6 +14,32 @@ from utils.decorators import admin_required
 pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/api/pedidos")
 
 
+# ─── GET /api/pedidos/test-email — solo admin, prueba el envío de email ───────
+
+@pedidos_bp.get("/test-email")
+@admin_required
+def test_email():
+    from flask import current_app
+    try:
+        cfg = {
+            "MAIL_SERVER":   current_app.config.get("MAIL_SERVER"),
+            "MAIL_PORT":     current_app.config.get("MAIL_PORT"),
+            "MAIL_USE_TLS":  current_app.config.get("MAIL_USE_TLS"),
+            "MAIL_USERNAME": current_app.config.get("MAIL_USERNAME"),
+            "MAIL_PASSWORD": "***" if current_app.config.get("MAIL_PASSWORD") else None,
+            "MAIL_DEFAULT_SENDER": current_app.config.get("MAIL_DEFAULT_SENDER"),
+        }
+        msg = Message(
+            subject="Test email — CUERAR TUCUMÁN",
+            recipients=[current_app.config.get("MAIL_USERNAME")],
+            body="Si recibes este correo, el servidor de email funciona correctamente.",
+        )
+        mail.send(msg)
+        return jsonify({"ok": True, "mensaje": "Email enviado correctamente", "config": cfg}), 200
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e), "config": cfg}), 500
+
+
 # ─── POST /api/pedidos — requiere login, crea un pedido ──────────────────────
 
 @pedidos_bp.post("")
