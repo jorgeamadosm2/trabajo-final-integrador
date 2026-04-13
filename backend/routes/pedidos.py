@@ -1,43 +1,14 @@
-import logging
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_mail import Message
 from bson.errors import InvalidId
 from datetime import datetime
 
-from extensions import mail
 from models.pedido import Pedido, ItemPedido
 from models.producto import Producto
 from models.usuario import Usuario
 from utils.decorators import admin_required
 
 pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/api/pedidos")
-
-
-# ─── GET /api/pedidos/test-email — solo admin, prueba el envío de email ───────
-
-@pedidos_bp.get("/test-email")
-@admin_required
-def test_email():
-    from flask import current_app
-    try:
-        cfg = {
-            "MAIL_SERVER":   current_app.config.get("MAIL_SERVER"),
-            "MAIL_PORT":     current_app.config.get("MAIL_PORT"),
-            "MAIL_USE_TLS":  current_app.config.get("MAIL_USE_TLS"),
-            "MAIL_USERNAME": current_app.config.get("MAIL_USERNAME"),
-            "MAIL_PASSWORD": "***" if current_app.config.get("MAIL_PASSWORD") else None,
-            "MAIL_DEFAULT_SENDER": current_app.config.get("MAIL_DEFAULT_SENDER"),
-        }
-        msg = Message(
-            subject="Test email — CUERAR TUCUMÁN",
-            recipients=[current_app.config.get("MAIL_USERNAME")],
-            body="Si recibes este correo, el servidor de email funciona correctamente.",
-        )
-        mail.send(msg)
-        return jsonify({"ok": True, "mensaje": "Email enviado correctamente", "config": cfg}), 200
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e), "config": cfg}), 500
 
 
 # ─── POST /api/pedidos — requiere login, crea un pedido ──────────────────────
@@ -125,74 +96,6 @@ def crear_pedido():
             producto.updated_at = datetime.utcnow()
             producto.save()
 
-    # Enviar email de confirmación al usuario
-    try:
-        items_html = "".join([
-            f"<tr>"
-            f"<td style='padding:6px 12px;border-bottom:1px solid #eee;'>{i.nombre}</td>"
-            f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:center;'>x{i.cantidad}</td>"
-            f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right;'>"
-            f"${i.subtotal:,.0f}</td>"
-            f"</tr>"
-            for i in pedido.items
-        ])
-        msg = Message(
-            subject=f"Pedido {pedido.numero} recibido — CUERAR TUCUMÁN",
-            recipients=[pedido.usuario_email],
-            html=f"""
-            <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;
-                        padding:24px;border:1px solid #e0e0e0;border-radius:8px;">
-                <h2 style="color:#8B4513;margin-bottom:4px;">CUERAR TUCUMÁN</h2>
-                <p style="color:#666;margin-top:0;">Confirmación de pedido</p>
-                <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
-                <p>Hola <strong>{pedido.usuario_nombre}</strong>,</p>
-                <p>¡Tu pedido fue recibido! Estos son los detalles:</p>
-                <p style="font-size:1.1rem;">
-                    Número de pedido: <strong style="color:#8B4513;">{pedido.numero}</strong>
-                </p>
-                <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-                    <thead>
-                        <tr style="background:#f5f0eb;">
-                            <th style="padding:8px 12px;text-align:left;">Producto</th>
-                            <th style="padding:8px 12px;text-align:center;">Cant.</th>
-                            <th style="padding:8px 12px;text-align:right;">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>{items_html}</tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2"
-                                style="padding:10px 12px;font-weight:bold;text-align:right;">
-                                Total:
-                            </td>
-                            <td style="padding:10px 12px;font-weight:bold;text-align:right;
-                                       color:#8B4513;font-size:1.1rem;">
-                                ${pedido.total:,.0f}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div style="background:#f5f0eb;padding:16px;border-radius:6px;margin:16px 0;">
-                    <p style="margin:0 0 8px;font-weight:bold;">Datos de pago:</p>
-                    <p style="margin:4px 0;">🏦 <strong>CBU:</strong> 2850590940090418135201
-                        &nbsp;|&nbsp; <strong>Alias:</strong> CUERAR.TUC.PAGO</p>
-                    <p style="margin:4px 0;">💳 <strong>Alias MP:</strong> cuerar.tucuman</p>
-                    <p style="margin:4px 0;">📲 Enviá el comprobante a:
-                        <strong>ventas@cuerartucuman.com.ar</strong>
-                        o por WhatsApp al <strong>(03865) 234-570</strong></p>
-                </div>
-                <p style="font-size:12px;color:#888;margin-top:16px;">
-                    El pedido se procesa una vez confirmado el pago.
-                    Ante cualquier duda no dudes en contactarnos.
-                </p>
-            </div>
-            """
-        )
-        mail.send(msg)
-    except Exception as e:
-        # El email es complementario: si falla, el pedido igual se guarda
-        logging.error("Error enviando email de confirmación (pedido %s): %s", pedido.numero, e)
-
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 201
 
 
@@ -235,67 +138,6 @@ def cambiar_estado(pedido_id):
     pedido.estado     = nuevo_estado
     pedido.updated_at = datetime.utcnow()
     pedido.save()
-
-    # Enviar email de confirmación cuando el pedido pasa a "procesado"
-    if nuevo_estado == "procesado":
-        try:
-            items_html = "".join([
-                f"<tr>"
-                f"<td style='padding:6px 12px;border-bottom:1px solid #eee;'>{i.nombre}</td>"
-                f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:center;'>x{i.cantidad}</td>"
-                f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right;'>"
-                f"${i.subtotal:,.0f}</td>"
-                f"</tr>"
-                for i in pedido.items
-            ])
-            msg = Message(
-                subject=f"Pedido {pedido.numero} confirmado — CUERAR TUCUMÁN",
-                recipients=[pedido.usuario_email],
-                html=f"""
-                <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;
-                            padding:24px;border:1px solid #e0e0e0;border-radius:8px;">
-                    <h2 style="color:#8B4513;margin-bottom:4px;">CUERAR TUCUMÁN</h2>
-                    <p style="color:#666;margin-top:0;">Pedido confirmado</p>
-                    <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
-                    <p>Hola <strong>{pedido.usuario_nombre}</strong>,</p>
-                    <p>¡Tu pago fue recibido y tu pedido está <strong style="color:#4CAF50;">confirmado</strong>!
-                       Pronto te contactaremos para coordinar la entrega.</p>
-                    <p style="font-size:1.1rem;">
-                        Número de pedido: <strong style="color:#8B4513;">{pedido.numero}</strong>
-                    </p>
-                    <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-                        <thead>
-                            <tr style="background:#f5f0eb;">
-                                <th style="padding:8px 12px;text-align:left;">Producto</th>
-                                <th style="padding:8px 12px;text-align:center;">Cant.</th>
-                                <th style="padding:8px 12px;text-align:right;">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>{items_html}</tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="2"
-                                    style="padding:10px 12px;font-weight:bold;text-align:right;">
-                                    Total:
-                                </td>
-                                <td style="padding:10px 12px;font-weight:bold;text-align:right;
-                                           color:#8B4513;font-size:1.1rem;">
-                                    ${pedido.total:,.0f}
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <p style="font-size:12px;color:#888;margin-top:16px;">
-                        Ante cualquier duda no dudes en contactarnos por WhatsApp al
-                        <strong>(03865) 234-570</strong> o a
-                        <strong>ventas@cuerartucuman.com.ar</strong>.
-                    </p>
-                </div>
-                """
-            )
-            mail.send(msg)
-        except Exception as e:
-            logging.error("Error enviando email de pedido procesado (pedido %s): %s", pedido.numero, e)
 
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 200
 
