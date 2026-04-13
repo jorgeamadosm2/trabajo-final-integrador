@@ -138,6 +138,12 @@
     <script src="../src/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Solo usuarios registrados pueden hacer pedidos
+            if (!estaLogueado()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
             const CARRITO_KEY = 'cuerar_carrito';
 
             // Generar número de pedido
