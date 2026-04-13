@@ -3510,3 +3510,245 @@ ul {
     font-size: 0.75rem;
     font-weight: 600;
 }
+
+/* ═══════════════════════════════════════
+   DASHBOARD ADMINISTRATIVO
+═══════════════════════════════════════ */
+
+.dash__actualizacion {
+    font-size: 0.8rem;
+    color: var(--color-texto-tenue);
+}
+
+/* KPI Cards */
+.dash__kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.dash__kpi {
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-lg);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--sombra-sm);
+    transition: box-shadow 0.2s;
+}
+
+.dash__kpi:hover { box-shadow: var(--sombra-md); }
+
+.dash__kpi-icono {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.dash__kpi-contenido {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.dash__kpi-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    font-family: var(--fuente-titulo);
+    line-height: 1;
+}
+
+.dash__kpi-label {
+    font-size: 0.75rem;
+    color: var(--color-texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Filas de tarjetas */
+.dash__fila {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.dash__fila--igual {
+    grid-template-columns: 1fr 1fr;
+}
+
+.dash__card {
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-lg);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--sombra-sm);
+}
+
+.dash__card-titulo {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-texto-tenue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+/* Top productos */
+.dash__top-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.dash__top-fila:last-child { margin-bottom: 0; }
+
+.dash__top-pos {
+    width: 1.6rem;
+    height: 1.6rem;
+    background: var(--color-primario);
+    color: var(--color-blanco);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.dash__top-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dash__top-nombre {
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--color-texto);
+}
+
+.dash__top-barra-bg {
+    height: 5px;
+    background: var(--color-fondo-seccion);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.dash__top-barra {
+    height: 100%;
+    background: var(--color-primario);
+    border-radius: 3px;
+}
+
+.dash__top-valor {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    flex-shrink: 0;
+    min-width: 5rem;
+    text-align: right;
+}
+
+/* Pedidos recientes */
+.dash__pedido-reciente {
+    display: grid;
+    grid-template-columns: 7rem 1fr auto auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--color-borde);
+    font-size: 0.85rem;
+}
+
+.dash__pedido-reciente:last-child { border-bottom: none; }
+
+.dash__pedido-num {
+    font-family: monospace;
+    font-size: 0.78rem;
+    color: var(--color-texto-tenue);
+}
+
+.dash__pedido-usuario {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-texto);
+}
+
+.dash__pedido-total {
+    font-weight: 700;
+    color: var(--color-primario);
+    white-space: nowrap;
+}
+
+.dash__pedido-fecha {
+    font-size: 0.78rem;
+    color: var(--color-texto-tenue);
+    white-space: nowrap;
+}
+
+/* Stock crítico */
+.dash__stock-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--color-borde);
+    font-size: 0.85rem;
+}
+
+.dash__stock-fila:last-child { border-bottom: none; }
+
+.dash__stock-nombre {
+    flex: 1;
+    font-weight: 500;
+    color: var(--color-texto);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash__stock-cantidad {
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 2px 8px;
+    border-radius: var(--radio-sm);
+}
+
+.dash__stock-cantidad--cero {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.dash__stock-cantidad--bajo {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .dash__fila,
+    .dash__fila--igual {
+        grid-template-columns: 1fr;
+    }
+
+    .dash__pedido-reciente {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 0.2rem;
+    }
+
+    .dash__pedido-num { grid-column: 1 / -1; }
+}
