@@ -1,17 +1,25 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.errors import InvalidId
 from datetime import datetime
 
 from models.pedido import Pedido, ItemPedido
+from models.usuario import Usuario
 from utils.decorators import admin_required
 
 pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/api/pedidos")
 
 
-# ─── POST /api/pedidos — público, crea un pedido ─────────────────────────────
+# ─── POST /api/pedidos — requiere login, crea un pedido ──────────────────────
 
 @pedidos_bp.post("")
+@jwt_required()
 def crear_pedido():
+    user_id = get_jwt_identity()
+    usuario = Usuario.objects(id=user_id).first()
+    if not usuario or not usuario.activo:
+        return jsonify({"ok": False, "error": "Usuario no encontrado o inactivo"}), 403
+
     data = request.get_json()
     if not data:
         return jsonify({"ok": False, "error": "Body JSON requerido"}), 400
@@ -45,7 +53,14 @@ def crear_pedido():
             unidad      = str(item.get("unidad", "") or ""),
         ))
 
-    pedido = Pedido(numero=numero, items=items, total=float(total))
+    pedido = Pedido(
+        numero         = numero,
+        usuario_id     = str(usuario.id),
+        usuario_nombre = usuario.nombre,
+        usuario_email  = usuario.email,
+        items          = items,
+        total          = float(total),
+    )
     pedido.save()
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 201
 

@@ -3134,6 +3134,13 @@ ul {
     pointer-events: none;
 }
 
+.carrito__aviso-login {
+    font-size: 0.8rem;
+    color: var(--color-texto-claro);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
 /* Toast de notificación */
 .carrito__toast {
     position: fixed;
@@ -3451,6 +3458,18 @@ ul {
     font-weight: 700;
     font-size: 1rem;
     color: var(--color-texto);
+}
+
+.admin__pedido-usuario {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--color-texto);
+    margin-bottom: 0.4rem;
+}
+
+.admin__pedido-usuario--anonimo {
+    color: var(--color-texto-claro);
+    font-style: italic;
 }
 
 .admin__pedido-items {

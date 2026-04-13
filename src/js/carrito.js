@@ -99,12 +99,23 @@ function renderizarDropdownCarrito() {
         </div>
     `).join('');
 
-    footerEl.innerHTML = `
-        <div class="carrito__total-row">
-            <span>Total:</span><strong>$${total.toLocaleString('es-AR')}</strong>
-        </div>
-        <a href="${urlPedido}" class="boton boton--primario carrito__btn-comprar">Comprar</a>
-    `;
+    if (typeof estaLogueado === 'function' && !estaLogueado()) {
+        const urlLogin = esPaginaRaiz ? 'pages/login.html' : 'login.html';
+        footerEl.innerHTML = `
+            <div class="carrito__total-row">
+                <span>Total:</span><strong>$${total.toLocaleString('es-AR')}</strong>
+            </div>
+            <p class="carrito__aviso-login">Iniciá sesión para realizar tu pedido</p>
+            <a href="${urlLogin}" class="boton boton--primario carrito__btn-comprar">Iniciar Sesión</a>
+        `;
+    } else {
+        footerEl.innerHTML = `
+            <div class="carrito__total-row">
+                <span>Total:</span><strong>$${total.toLocaleString('es-AR')}</strong>
+            </div>
+            <a href="${urlPedido}" class="boton boton--primario carrito__btn-comprar">Comprar</a>
+        `;
+    }
 }
 
 function mostrarToast(mensaje) {

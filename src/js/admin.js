@@ -525,6 +525,9 @@ function renderizarPedidos(pedidos) {
         const esPendiente  = p.estado === "pendiente";
         const resumenItems = p.items.map(i => `${i.nombre} x${i.cantidad}`).join(", ");
         const nuevoEstado  = esPendiente ? "procesado" : "pendiente";
+        const usuarioInfo  = p.usuario_nombre
+            ? `<span class="admin__pedido-usuario">👤 ${p.usuario_nombre} &mdash; <em>${p.usuario_email}</em></span>`
+            : `<span class="admin__pedido-usuario admin__pedido-usuario--anonimo">👤 Usuario no registrado</span>`;
 
         return `
         <div class="admin__pedido ${esPendiente ? "admin__pedido--pendiente" : ""}" id="pedido-${p.id}">
@@ -540,6 +543,7 @@ function renderizarPedidos(pedidos) {
                     <span class="admin__pedido-total">$${p.total.toLocaleString("es-AR")}</span>
                 </div>
             </div>
+            ${usuarioInfo}
             <p class="admin__pedido-items">${resumenItems}</p>
             <div class="admin__fila-acciones">
                 <button class="admin__btn ${esPendiente ? "admin__btn--leido" : "admin__btn--editar"}"

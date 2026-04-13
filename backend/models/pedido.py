@@ -22,22 +22,28 @@ class ItemPedido(EmbeddedDocument):
 
 
 class Pedido(Document):
-    numero     = StringField(required=True, unique=True)   # "CT-xxxxxx" generado en el frontend
-    items      = ListField(EmbeddedDocumentField(ItemPedido))
-    total      = FloatField(required=True)
-    estado     = StringField(default="pendiente", choices=["pendiente", "procesado"])
-    created_at = DateTimeField(default=datetime.utcnow)
-    updated_at = DateTimeField(default=datetime.utcnow)
+    numero         = StringField(required=True, unique=True)   # "CT-xxxxxx" generado en el frontend
+    usuario_id     = StringField()   # ID del usuario que realizó el pedido
+    usuario_nombre = StringField()   # Nombre snapshot al momento del pedido
+    usuario_email  = StringField()   # Email snapshot al momento del pedido
+    items          = ListField(EmbeddedDocumentField(ItemPedido))
+    total          = FloatField(required=True)
+    estado         = StringField(default="pendiente", choices=["pendiente", "procesado"])
+    created_at     = DateTimeField(default=datetime.utcnow)
+    updated_at     = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "pedidos", "ordering": ["-created_at"]}
 
     def to_dict(self):
         return {
-            "id":         str(self.id),
-            "numero":     self.numero,
-            "items":      [i.to_dict() for i in self.items],
-            "total":      self.total,
-            "estado":     self.estado,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "id":             str(self.id),
+            "numero":         self.numero,
+            "usuario_id":     self.usuario_id,
+            "usuario_nombre": self.usuario_nombre,
+            "usuario_email":  self.usuario_email,
+            "items":          [i.to_dict() for i in self.items],
+            "total":          self.total,
+            "estado":         self.estado,
+            "created_at":     self.created_at.isoformat(),
+            "updated_at":     self.updated_at.isoformat(),
         }
