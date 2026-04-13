@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_mail import Message
@@ -162,9 +163,9 @@ def crear_pedido():
             """
         )
         mail.send(msg)
-    except Exception:
+    except Exception as e:
         # El email es complementario: si falla, el pedido igual se guarda
-        pass
+        logging.error("Error enviando email de confirmación (pedido %s): %s", pedido.numero, e)
 
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 201
 
