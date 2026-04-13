@@ -1,6 +1,6 @@
 # CUERAR TUCUMÁN — Trabajo Final Integrador
 
-Sitio web e-commerce para una empresa de cueros ubicada en Tucumán, Argentina. Permite a los visitantes explorar el catálogo de productos, contactarse con la empresa y, a los administradores, gestionar el inventario y los mensajes recibidos desde un panel dedicado.
+Sitio web e-commerce para una empresa de cueros ubicada en Tucumán, Argentina. Permite a los visitantes explorar el catálogo de productos, agregar productos al carrito y generar pedidos, contactarse con la empresa y, a los administradores, gestionar el inventario, los mensajes y los pedidos recibidos desde un panel dedicado.
 
 ---
 
@@ -14,12 +14,18 @@ Sitio web e-commerce para una empresa de cueros ubicada en Tucumán, Argentina. 
 - **Python 3** + **Flask** — API REST
 - **MongoEngine** — ODM para MongoDB
 - **Flask-JWT-Extended** — autenticación con tokens JWT
+- **Flask-Mail** — envío de emails (recuperación de contraseña)
 - **Flask-CORS** — habilitación de CORS para el frontend
 - **Werkzeug** — hashing seguro de contraseñas
 - **python-dotenv** — variables de entorno
+- **Gunicorn** — servidor WSGI para producción
 
 ### Base de datos
 - **MongoDB Atlas** (cloud, tier gratuito M0)
+
+### Despliegue
+- **Backend**: Render (gunicorn + variable `PORT`)
+- **Frontend**: Vercel
 
 ---
 
@@ -33,14 +39,18 @@ TRABAJO-FINAL-INTEGRADOR/
 │   ├── productos.html          # Catálogo completo
 │   ├── sobre-nosotros.html     # Historia y equipo
 │   ├── contacto.html           # Formulario de contacto
+│   ├── pedido.html             # Carrito y confirmación de pedido
 │   ├── login.html              # Inicio de sesión
 │   ├── registro.html           # Crear cuenta
+│   ├── recuperar-contrasena.html  # Solicitar reset de contraseña
+│   ├── nueva-contrasena.html   # Ingresar nueva contraseña (desde email)
 │   └── admin.html              # Panel de administración
 ├── src/
 │   ├── js/
 │   │   ├── api.js              # Cliente central HTTP (apiFetch)
 │   │   ├── auth.js             # Sesión, navbar dinámico, logout
 │   │   ├── productos-api.js    # Carga y renderiza productos desde la API
+│   │   ├── carrito.js          # Lógica del carrito y generación de pedidos
 │   │   ├── contacto-api.js     # Envía formulario de contacto a la API
 │   │   ├── admin.js            # Lógica del panel de administración
 │   │   └── main.js             # Interacciones generales de UI
@@ -49,15 +59,18 @@ TRABAJO-FINAL-INTEGRADOR/
     ├── app.py                  # Factory function create_app()
     ├── config.py               # Configuración (lee variables de entorno)
     ├── run.py                  # Punto de entrada del servidor
+    ├── extensions.py           # Instancias de mail y jwt (evita imports circulares)
     ├── requirements.txt        # Dependencias pip
     ├── .env.example            # Plantilla de variables de entorno
     ├── models/
-    │   ├── usuario.py          # Modelo de usuario (admin / usuario)
-    │   ├── producto.py         # Modelo de producto (con soft-delete)
+    │   ├── usuario.py          # Modelo de usuario (admin / usuario, baja lógica)
+    │   ├── producto.py         # Modelo de producto (con soft-delete, FK → usuario)
+    │   ├── pedido.py           # Modelo de pedido con items embebidos
     │   └── contacto.py         # Modelo de mensaje de contacto
     ├── routes/
-    │   ├── auth.py             # /api/auth — register, login, me
+    │   ├── auth.py             # /api/auth — register, login, me, ABM usuarios, reset password
     │   ├── productos.py        # /api/productos — CRUD
+    │   ├── pedidos.py          # /api/pedidos — crear, listar, cambiar estado, eliminar
     │   └── contacto.py         # /api/contacto — enviar y gestionar mensajes
     └── utils/
         ├── decorators.py       # Decorador admin_required
@@ -108,6 +121,15 @@ MONGO_URI=mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/cuerar_db
 JWT_SECRET_KEY=una-clave-secreta-larga-y-aleatoria
 FLASK_ENV=development
 ADMIN_SECRET_CODE=codigo-secreto-para-admins
+FRONTEND_URL=http://localhost:5500
+
+# Configuración de email (para recuperación de contraseña)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=tu-email@gmail.com
+MAIL_PASSWORD=app-password-de-gmail
+MAIL_DEFAULT_SENDER=tu-email@gmail.com
 ```
 
 > El archivo `.env` nunca debe subirse al repositorio (ya está en `.gitignore`).
@@ -144,6 +166,11 @@ La API base es `http://localhost:5000/api`.
 | POST | `/api/auth/register` | Registrar nuevo usuario | No |
 | POST | `/api/auth/login` | Iniciar sesión, devuelve JWT | No |
 | GET | `/api/auth/me` | Datos del usuario actual | JWT |
+| POST | `/api/auth/forgot-password` | Solicitar reset de contraseña por email | No |
+| POST | `/api/auth/reset-password` | Confirmar nueva contraseña con token | No |
+| GET | `/api/auth/usuarios` | Listar todos los usuarios | Admin JWT |
+| PUT | `/api/auth/usuarios/<id>` | Editar nombre y rol de un usuario | Admin JWT |
+| PATCH | `/api/auth/usuarios/<id>/estado` | Activar / desactivar usuario (baja lógica) | Admin JWT |
 
 Para crear un administrador, incluir `codigo_admin` en el body del registro.
 
@@ -159,6 +186,15 @@ Para crear un administrador, incluir `codigo_admin` en el body del registro.
 | PUT | `/api/productos/<id>` | Editar producto | Admin JWT |
 | DELETE | `/api/productos/<id>` | Desactivar producto (soft-delete) | Admin JWT |
 
+### Pedidos — `/api/pedidos`
+
+| Método | Ruta | Descripción | Auth |
+|--------|------|-------------|------|
+| POST | `/api/pedidos` | Crear un pedido desde el carrito | No |
+| GET | `/api/pedidos` | Listar todos los pedidos (`?estado=pendiente`) | Admin JWT |
+| PATCH | `/api/pedidos/<id>/estado` | Cambiar estado (`pendiente` / `procesado`) | Admin JWT |
+| DELETE | `/api/pedidos/<id>` | Eliminar un pedido | Admin JWT |
+
 ### Contacto — `/api/contacto`
 
 | Método | Ruta | Descripción | Auth |
@@ -166,6 +202,7 @@ Para crear un administrador, incluir `codigo_admin` en el body del registro.
 | POST | `/api/contacto` | Enviar mensaje de contacto | No |
 | GET | `/api/contacto` | Ver todos los mensajes | Admin JWT |
 | PATCH | `/api/contacto/<id>/leido` | Marcar mensaje como leído | Admin JWT |
+| DELETE | `/api/contacto/<id>` | Eliminar mensaje | Admin JWT |
 
 ---
 
@@ -173,7 +210,7 @@ Para crear un administrador, incluir `codigo_admin` en el body del registro.
 
 | Rol | Cómo se obtiene | Acceso |
 |-----|----------------|--------|
-| Visitante | Sin cuenta | Catálogo público y formulario de contacto |
+| Visitante | Sin cuenta | Catálogo público, carrito y formulario de contacto |
 | Usuario | Registro sin código | Navbar personalizado |
 | Administrador | Registro con `ADMIN_SECRET_CODE` | Panel de administración completo |
 
@@ -183,13 +220,37 @@ Para crear un administrador, incluir `codigo_admin` en el body del registro.
 
 Accesible en `/pages/admin.html` (solo para administradores).
 
-- **Estadísticas**: productos activos, inactivos y mensajes sin leer
-- **Gestión de productos**: agregar, editar, desactivar y restaurar productos
-- **Filtros**: por categoría (materia prima, elaborados, herramientas)
-- **Mensajes de contacto**: ver, filtrar por leídos/no leídos, marcar como leído
+- **Estadísticas**: productos activos, inactivos, mensajes sin leer y pedidos pendientes
+- **Gestión de productos**: agregar, editar, desactivar y restaurar productos; filtros por categoría
+- **Gestión de pedidos**: ver pedidos recibidos, filtrar por estado, marcar como procesado, eliminar
+- **Mensajes de contacto**: ver, filtrar por leídos/no leídos, marcar como leído, eliminar
+- **Gestión de usuarios**: listar, editar nombre/rol y activar/desactivar cuentas (ABM completo)
+- **Exportar a CSV**: exportar la lista de productos, pedidos o mensajes desde cada sección
+
+---
+
+## Carrito de compras
+
+Los visitantes pueden agregar productos al carrito desde el catálogo. El carrito persiste en `localStorage` y permite:
+
+- Agregar y quitar productos, modificar cantidades
+- Ver el resumen con subtotales y total
+- Confirmar el pedido (genera un número único `CT-xxxxxx` y lo registra en la API)
+- Ver la confirmación con el número de pedido asignado
+
+---
+
+## Recuperación de contraseña
+
+Flujo completo por email:
+
+1. El usuario ingresa su email en `/pages/recuperar-contrasena.html`
+2. La API genera un token (válido 1 hora) y envía un email con el link de reset
+3. El usuario hace clic en el link → `/pages/nueva-contrasena.html?token=...`
+4. Ingresa la nueva contraseña; la API valida el token y actualiza el hash
 
 ---
 
 ## Autor
 
-Jorge Amado — Trabajo Final Integrador
+Jorge Abraham Amado Sancho Miñano — Trabajo Final Integrador

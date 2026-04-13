@@ -8,6 +8,7 @@ let todosLosProductos = [];  // cache de productos cargados
 let filtroCategoriaActual = "";
 let modoEdicion = false;     // false = agregar, true = editar
 let todosUsuarios = [];      // cache de usuarios cargados
+let todosPedidos  = [];      // cache de pedidos (MongoDB via API)
 
 // ─── Inicialización ───────────────────────────────────────────────────────────
 
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Cargar datos en paralelo
-    await Promise.all([cargarProductos(), cargarMensajes(), cargarUsuarios()]);
+    await Promise.all([cargarProductos(), cargarMensajes(), cargarUsuarios(), cargarPedidos()]);
 
     // Listener del formulario de producto
     document.getElementById("formProducto").addEventListener("submit", guardarProducto);
@@ -34,12 +35,14 @@ function mostrarTab(tab) {
     const secciones = {
         productos: "seccionProductos",
         mensajes:  "seccionMensajes",
-        usuarios:  "seccionUsuarios"
+        usuarios:  "seccionUsuarios",
+        pedidos:   "seccionPedidos"
     };
     const tabs = {
         productos: "tabProductos",
         mensajes:  "tabMensajes",
-        usuarios:  "tabUsuarios"
+        usuarios:  "tabUsuarios",
+        pedidos:   "tabPedidos"
     };
 
     Object.entries(secciones).forEach(([key, id]) => {
@@ -477,6 +480,103 @@ async function toggleEstadoUsuario(id, estadoActual) {
     }
 }
 
+// ─── PEDIDOS ──────────────────────────────────────────────────────────────────
+
+async function cargarPedidos() {
+    try {
+        const datos = await apiFetch("/pedidos");
+        todosPedidos = datos.pedidos;
+
+        const pendientes = todosPedidos.filter(p => p.estado === "pendiente").length;
+        document.getElementById("statPedidos").textContent = pendientes;
+
+        if (pendientes > 0) {
+            document.getElementById("badgePedidos").textContent = pendientes;
+            document.getElementById("badgePedidos").style.display = "inline-flex";
+            document.getElementById("statPedidosBox").classList.add("admin__stat--alerta-activa");
+        }
+
+        renderizarPedidos(todosPedidos);
+    } catch (e) {
+        document.getElementById("listaPedidos").innerHTML =
+            `<p style="color:red;padding:1rem;">Error al cargar pedidos: ${e.message}</p>`;
+    }
+}
+
+function filtrarPedidos(btn, filtro) {
+    document.querySelectorAll("#seccionPedidos .admin__filtro").forEach(b => b.classList.remove("admin__filtro--activo"));
+    btn.classList.add("admin__filtro--activo");
+
+    const lista = filtro === 'todos'
+        ? todosPedidos
+        : todosPedidos.filter(p => p.estado === filtro);
+    renderizarPedidos(lista);
+}
+
+function renderizarPedidos(pedidos) {
+    const contenedor = document.getElementById("listaPedidos");
+
+    if (!pedidos.length) {
+        contenedor.innerHTML = `<p class="admin__vacio">No hay pedidos para mostrar.</p>`;
+        return;
+    }
+
+    contenedor.innerHTML = pedidos.map(p => {
+        const esPendiente  = p.estado === "pendiente";
+        const resumenItems = p.items.map(i => `${i.nombre} x${i.cantidad}`).join(", ");
+        const nuevoEstado  = esPendiente ? "procesado" : "pendiente";
+
+        return `
+        <div class="admin__pedido ${esPendiente ? "admin__pedido--pendiente" : ""}" id="pedido-${p.id}">
+            <div class="admin__pedido-cabecera">
+                <div class="admin__pedido-id">
+                    <span class="admin__pedido-numero">${p.numero}</span>
+                    <span class="admin__mensaje-fecha">${formatearFecha(p.created_at)}</span>
+                </div>
+                <div class="admin__pedido-meta">
+                    <span class="admin__badge ${esPendiente ? "admin__badge--pendiente" : "admin__badge--procesado"}">
+                        ${esPendiente ? "⏳ Pendiente" : "✓ Procesado"}
+                    </span>
+                    <span class="admin__pedido-total">$${p.total.toLocaleString("es-AR")}</span>
+                </div>
+            </div>
+            <p class="admin__pedido-items">${resumenItems}</p>
+            <div class="admin__fila-acciones">
+                <button class="admin__btn ${esPendiente ? "admin__btn--leido" : "admin__btn--editar"}"
+                    onclick="toggleEstadoPedido('${p.id}', '${nuevoEstado}')">
+                    ${esPendiente ? "✓ Marcar procesado" : "↩ Marcar pendiente"}
+                </button>
+                <button class="admin__btn admin__btn--eliminar" onclick="eliminarPedido('${p.id}', '${p.numero}')">
+                    🗑 Eliminar
+                </button>
+            </div>
+        </div>
+        `;
+    }).join("");
+}
+
+async function toggleEstadoPedido(id, nuevoEstado) {
+    try {
+        await apiFetch(`/pedidos/${id}/estado`, {
+            method: "PATCH",
+            body: JSON.stringify({ estado: nuevoEstado }),
+        });
+        await cargarPedidos(); // recargar desde la API para reflejar el cambio
+    } catch (e) {
+        alert("Error al cambiar el estado: " + e.message);
+    }
+}
+
+async function eliminarPedido(id, numero) {
+    if (!confirm(`¿Seguro que querés eliminar el pedido ${numero}? Esta acción no se puede deshacer.`)) return;
+    try {
+        await apiFetch(`/pedidos/${id}`, { method: "DELETE" });
+        await cargarPedidos();
+    } catch (e) {
+        alert("Error al eliminar: " + e.message);
+    }
+}
+
 // ─── Utilidades ───────────────────────────────────────────────────────────────
 
 function formatearFecha(isoString) {
@@ -528,6 +628,22 @@ function exportarMensajes() {
         ])
     ];
     exportarCSV(filas, `mensajes_${fecha}.csv`);
+}
+
+function exportarPedidos() {
+    if (!todosPedidos.length) { alert("No hay pedidos cargados para exportar."); return; }
+    const fecha = new Date().toISOString().slice(0, 10);
+    const filas = [
+        ["Número de Pedido", "Fecha", "Estado", "Productos", "Total (ARS)"],
+        ...todosPedidos.map(p => [
+            p.numero,
+            formatearFecha(p.created_at),
+            p.estado === "pendiente" ? "Pendiente" : "Procesado",
+            p.items.map(i => `${i.nombre} x${i.cantidad}`).join(" | "),
+            p.total
+        ])
+    ];
+    exportarCSV(filas, `pedidos_${fecha}.csv`);
 }
 
 function exportarUsuarios() {

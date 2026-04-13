@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado | CUERAR TUCUMÁN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ======== ENCABEZADO ======== -->
+    <header class="encabezado" id="encabezado">
+        <div class="encabezado__contenedor">
+            <a href="../index.html" class="encabezado__logo">
+                <div class="encabezado__logo-texto">
+                    <span class="encabezado__marca">CUERAR</span>
+                    <span class="encabezado__ubicacion">TUCUMÁN</span>
+                </div>
+            </a>
+
+            <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="encabezado__navegacion" id="menuNav">
+                <ul class="encabezado__lista-nav">
+                    <li><a href="../index.html" class="encabezado__enlace-nav">Inicio</a></li>
+                    <li><a href="productos.html" class="encabezado__enlace-nav">Productos</a></li>
+                    <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
+                    <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
+                </ul>
+                <div class="encabezado__auth" id="navAuth"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======== CONTENIDO PEDIDO ======== -->
+    <main class="pedido-pagina">
+        <div class="contenedor">
+
+            <div class="pedido__confirmacion">
+                <div class="pedido__icono-exito">✓</div>
+                <h1 class="pedido__titulo">¡Pedido Recibido!</h1>
+                <p class="pedido__subtitulo">Gracias por tu compra. Revisá los datos de pago a continuación y envianos el comprobante.</p>
+                <div class="pedido__numero-box">
+                    <span class="pedido__numero-etiqueta">Número de Pedido</span>
+                    <span class="pedido__numero" id="numeroPedido">#000000</span>
+                </div>
+            </div>
+
+            <div class="pedido__grilla">
+
+                <!-- Resumen del pedido -->
+                <div class="pedido__card">
+                    <h2 class="pedido__card-titulo">Resumen del Pedido</h2>
+                    <div id="resumenItems" class="pedido__items-lista"></div>
+                    <div class="pedido__total-row pedido__total-row--grande">
+                        <span>Total a pagar:</span>
+                        <strong id="totalPedido">$0</strong>
+                    </div>
+                </div>
+
+                <!-- Datos de pago -->
+                <div class="pedido__card">
+                    <h2 class="pedido__card-titulo">Datos de Pago</h2>
+                    <p class="pedido__pago-instruccion">
+                        Realizá la transferencia bancaria o el pago por Mercado Pago y envianos el comprobante por WhatsApp o email.
+                    </p>
+
+                    <div class="pedido__metodo">
+                        <h3 class="pedido__metodo-titulo">🏦 Transferencia Bancaria</h3>
+                        <ul class="pedido__datos-banco">
+                            <li><span>Banco:</span><strong>Banco Macro</strong></li>
+                            <li><span>Titular:</span><strong>CUERAR TUCUMÁN S.R.L.</strong></li>
+                            <li><span>CUIT:</span><strong>30-71234567-8</strong></li>
+                            <li><span>CBU:</span><strong>2850590940090418135201</strong></li>
+                            <li><span>Alias:</span><strong>CUERAR.TUC.PAGO</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="pedido__metodo">
+                        <h3 class="pedido__metodo-titulo">💳 Mercado Pago</h3>
+                        <ul class="pedido__datos-banco">
+                            <li><span>Alias MP:</span><strong>cuerar.tucuman</strong></li>
+                            <li><span>CVU:</span><strong>0000003100069874551831</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="pedido__metodo">
+                        <h3 class="pedido__metodo-titulo">📲 Enviar comprobante a:</h3>
+                        <ul class="pedido__datos-banco">
+                            <li><span>WhatsApp:</span><strong>(03865) 234-570</strong></li>
+                            <li><span>Email:</span><strong>ventas@cuerartucuman.com.ar</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="pedido__aviso">
+                        ⚠️ El pedido se procesa una vez confirmado el pago. Ante cualquier duda contactanos.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pedido__acciones">
+                <button class="boton boton--primario" id="btnConfirmarPedido">Confirmar Pedido</button>
+                <a href="productos.html" class="boton boton--contorno">Seguir Comprando</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ======== PIE DE PÁGINA ======== -->
+    <footer class="pie" id="pie">
+        <div class="contenedor">
+            <div class="pie__inferior">
+                <p>&copy; 2026 CUERAR TUCUMÁN. Todos los derechos reservados.</p>
+                <div class="pie__redes">
+                    <a href="https://www.instagram.com/cuerar_tuc/" class="pie__enlace-red" aria-label="Instagram">IG</a>
+                    <a href="https://wa.me/5493865234570" class="pie__enlace-red" aria-label="WhatsApp">WA</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
+    <a href="https://wa.me/5493865234570" class="whatsapp-flotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <script src="../src/js/api.js"></script>
+    <script src="../src/js/auth.js"></script>
+    <script src="../src/js/carrito.js"></script>
+    <script src="../src/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const CARRITO_KEY = 'cuerar_carrito';
+
+            // Generar número de pedido
+            const numeroPedido = 'CT-' + Date.now().toString().slice(-6);
+            document.getElementById('numeroPedido').textContent = '#' + numeroPedido;
+
+            // Cargar items del carrito
+            const carrito = JSON.parse(localStorage.getItem(CARRITO_KEY) || '[]');
+            const resumenEl = document.getElementById('resumenItems');
+            const totalEl  = document.getElementById('totalPedido');
+            const btn       = document.getElementById('btnConfirmarPedido');
+
+            if (carrito.length === 0) {
+                resumenEl.innerHTML = '<p style="color:var(--color-texto-claro);text-align:center;padding:1rem 0;">No hay productos en el carrito.</p>';
+                totalEl.textContent = '$0';
+                btn.disabled = true;
+            } else {
+                const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+                resumenEl.innerHTML = carrito.map(item => `
+                    <div class="pedido__item-fila">
+                        <span class="pedido__item-nombre">${item.nombre} <em>x${item.cantidad}</em></span>
+                        <span class="pedido__item-subtotal">$${(item.precio * item.cantidad).toLocaleString('es-AR')}</span>
+                    </div>
+                `).join('');
+                totalEl.textContent = '$' + total.toLocaleString('es-AR');
+            }
+
+            // Confirmar pedido: POST a la API y limpiar carrito
+            btn.addEventListener('click', async () => {
+                if (carrito.length === 0) return;
+
+                btn.disabled = true;
+                btn.textContent = 'Guardando pedido...';
+
+                const total = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
+
+                try {
+                    await apiFetch('/pedidos', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            numero: numeroPedido,
+                            items:  carrito,
+                            total:  total,
+                        }),
+                    });
+
+                    // Éxito: limpiar carrito y mostrar confirmación
+                    localStorage.removeItem(CARRITO_KEY);
+                    btn.textContent = '✓ Pedido Confirmado';
+                    btn.style.background = 'var(--color-whatsapp)';
+
+                    const aviso = document.createElement('p');
+                    aviso.className = 'pedido__confirmado-msg';
+                    aviso.textContent = 'Tu pedido fue registrado. Envianos el comprobante de pago para procesarlo.';
+                    btn.parentNode.insertBefore(aviso, btn.nextSibling);
+
+                } catch (err) {
+                    // Si la API falla, mostrar el error y re-habilitar el botón
+                    btn.disabled = false;
+                    btn.textContent = 'Confirmar Pedido';
+
+                    const errEl = document.createElement('p');
+                    errEl.style.cssText = 'color:red;text-align:center;margin-top:.5rem;font-size:.85rem;';
+                    errEl.textContent = 'Error al registrar el pedido: ' + err.message + '. Intentá de nuevo.';
+                    btn.parentNode.insertBefore(errEl, btn.nextSibling);
+                    setTimeout(() => errEl.remove(), 5000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
