@@ -22,6 +22,9 @@ def _validar_producto(data):
         errores.append("El campo 'categoria' es requerido")
     elif data["categoria"] not in CATEGORIAS_VALIDAS:
         errores.append(f"'categoria' debe ser uno de: {CATEGORIAS_VALIDAS}")
+    stock = data.get("stock")
+    if stock is not None and (not isinstance(stock, int) or stock < 0):
+        errores.append("'stock' debe ser un número entero positivo o nulo")
     return errores
 
 
@@ -111,6 +114,7 @@ def crear_producto():
     # Obtener el admin que está creando el producto (relación FK explícita)
     admin = Usuario.objects(id=get_jwt_identity()).first()
 
+    stock_raw = data.get("stock")
     producto = Producto(
         nombre      = data["nombre"].strip(),
         descripcion = data.get("descripcion", ""),
@@ -120,6 +124,7 @@ def crear_producto():
         imagen_url  = data.get("imagen_url"),
         etiqueta    = data.get("etiqueta"),
         destacado   = bool(data.get("destacado", False)),
+        stock       = int(stock_raw) if stock_raw is not None else None,
         creado_por  = admin,
     )
     producto.save()
@@ -146,6 +151,7 @@ def editar_producto(producto_id):
     if errores:
         return jsonify({"ok": False, "errores": errores}), 400
 
+    stock_raw = data.get("stock")
     producto.nombre      = data["nombre"].strip()
     producto.descripcion = data.get("descripcion", producto.descripcion)
     producto.precio      = float(data["precio"])
@@ -154,6 +160,7 @@ def editar_producto(producto_id):
     producto.imagen_url  = data.get("imagen_url", producto.imagen_url)
     producto.etiqueta    = data.get("etiqueta", producto.etiqueta)
     producto.destacado   = bool(data.get("destacado", producto.destacado))
+    producto.stock       = int(stock_raw) if stock_raw is not None else None
     if "activo" in data:
         producto.activo  = bool(data["activo"])
     producto.updated_at  = datetime.utcnow()
