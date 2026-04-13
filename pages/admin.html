@@ -42,30 +42,46 @@
         <div class="admin__banner">
             <div class="admin__banner-contenido">
                 <div>
-                    <h1 class="admin__banner-titulo">⚙ Panel de Administración</h1>
+                    <h1 class="admin__banner-titulo">Administración</h1>
                     <p class="admin__banner-subtitulo">Gestioná los productos, mensajes y usuarios de CUERAR TUCUMÁN</p>
                 </div>
                 <!-- Estadísticas rápidas -->
                 <div class="admin__stats" id="adminStats">
-                    <div class="admin__stat">
+                    <!-- Tab: Productos -->
+                    <div class="admin__stat" data-tab="productos">
                         <span class="admin__stat-numero" id="statProductos">—</span>
                         <span class="admin__stat-label">Productos activos</span>
                     </div>
-                    <div class="admin__stat">
+                    <div class="admin__stat" data-tab="productos">
                         <span class="admin__stat-numero" id="statInactivos">—</span>
                         <span class="admin__stat-label">Inactivos</span>
                     </div>
-                    <div class="admin__stat admin__stat--alerta" id="statMensajesBox">
+                    <!-- Tab: Mensajes -->
+                    <div class="admin__stat admin__stat--alerta" id="statMensajesBox" data-tab="mensajes" style="display:none;">
                         <span class="admin__stat-numero" id="statMensajes">—</span>
-                        <span class="admin__stat-label">Mensajes sin leer</span>
+                        <span class="admin__stat-label">Sin leer</span>
                     </div>
-                    <div class="admin__stat">
+                    <div class="admin__stat" data-tab="mensajes" style="display:none;">
+                        <span class="admin__stat-numero" id="statTotalMensajes">—</span>
+                        <span class="admin__stat-label">Total mensajes</span>
+                    </div>
+                    <!-- Tab: Usuarios -->
+                    <div class="admin__stat" data-tab="usuarios" style="display:none;">
                         <span class="admin__stat-numero" id="statUsuarios">—</span>
                         <span class="admin__stat-label">Usuarios registrados</span>
                     </div>
-                    <div class="admin__stat admin__stat--alerta" id="statPedidosBox">
+                    <div class="admin__stat" data-tab="usuarios" style="display:none;">
+                        <span class="admin__stat-numero" id="statAdmins">—</span>
+                        <span class="admin__stat-label">Administradores</span>
+                    </div>
+                    <!-- Tab: Pedidos -->
+                    <div class="admin__stat admin__stat--alerta" id="statPedidosBox" data-tab="pedidos" style="display:none;">
                         <span class="admin__stat-numero" id="statPedidos">—</span>
                         <span class="admin__stat-label">Pedidos pendientes</span>
+                    </div>
+                    <div class="admin__stat" data-tab="pedidos" style="display:none;">
+                        <span class="admin__stat-numero" id="statPedidosProcesados">—</span>
+                        <span class="admin__stat-label">Procesados</span>
                     </div>
                 </div>
             </div>

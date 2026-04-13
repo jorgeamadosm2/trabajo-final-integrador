@@ -51,6 +51,11 @@ function mostrarTab(tab) {
     Object.entries(tabs).forEach(([key, id]) => {
         document.getElementById(id).classList.toggle("admin__tab--activo", key === tab);
     });
+
+    // Mostrar solo las stats correspondientes a la tab activa
+    document.querySelectorAll("#adminStats .admin__stat[data-tab]").forEach(el => {
+        el.style.display = el.dataset.tab === tab ? "" : "none";
+    });
 }
 
 // ─── PRODUCTOS ────────────────────────────────────────────────────────────────
@@ -261,8 +266,9 @@ async function cargarMensajes() {
         todosMensajes = datos.mensajes;
         const noLeidos = todosMensajes.filter(m => !m.leido).length;
 
-        // Actualizar badge del tab y stat
+        // Actualizar badge del tab y stats
         document.getElementById("statMensajes").textContent = noLeidos;
+        document.getElementById("statTotalMensajes").textContent = todosMensajes.length;
         if (noLeidos > 0) {
             document.getElementById("badgeMensajes").textContent = noLeidos;
             document.getElementById("badgeMensajes").style.display = "inline-flex";
@@ -364,9 +370,10 @@ async function eliminarMensaje(id) {
         todosMensajes = todosMensajes.filter(m => m.id !== id);
         document.getElementById(`msg-${id}`)?.remove();
 
-        // Actualizar contador
+        // Actualizar contadores
         const noLeidos = todosMensajes.filter(m => !m.leido).length;
         document.getElementById("statMensajes").textContent = noLeidos;
+        document.getElementById("statTotalMensajes").textContent = todosMensajes.length;
         const badge = document.getElementById("badgeMensajes");
         badge.textContent = noLeidos;
         if (noLeidos === 0) badge.style.display = "none";
@@ -387,6 +394,7 @@ async function cargarUsuarios() {
         const datos = await apiFetch("/auth/usuarios");
         todosUsuarios = datos.usuarios;
         document.getElementById("statUsuarios").textContent = todosUsuarios.length;
+        document.getElementById("statAdmins").textContent = todosUsuarios.filter(u => u.es_admin).length;
         renderizarUsuarios(todosUsuarios);
     } catch (e) {
         document.getElementById("listaUsuarios").innerHTML =
@@ -495,8 +503,10 @@ async function cargarPedidos() {
         const datos = await apiFetch("/pedidos");
         todosPedidos = datos.pedidos;
 
-        const pendientes = todosPedidos.filter(p => p.estado === "pendiente").length;
+        const pendientes  = todosPedidos.filter(p => p.estado === "pendiente").length;
+        const procesados  = todosPedidos.filter(p => p.estado === "procesado").length;
         document.getElementById("statPedidos").textContent = pendientes;
+        document.getElementById("statPedidosProcesados").textContent = procesados;
 
         if (pendientes > 0) {
             document.getElementById("badgePedidos").textContent = pendientes;
