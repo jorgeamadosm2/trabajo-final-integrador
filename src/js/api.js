@@ -30,6 +30,14 @@ async function apiFetch(path, opciones = {}) {
   const datos = await respuesta.json();
 
   if (!respuesta.ok) {
+    // Token vencido o inválido: cerrar sesión y redirigir al login
+    if (respuesta.status === 401) {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("usuario_data");
+      const enPages = window.location.pathname.includes("/pages/");
+      window.location.href = (enPages ? "../" : "") + "pages/login.html";
+      return;
+    }
     // Lanza un error con el mensaje que devuelve la API
     throw new Error(datos.error || datos.errores?.join(", ") || "Error en la API");
   }
