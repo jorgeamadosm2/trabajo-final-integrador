@@ -81,44 +81,91 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ---- Filtro de Productos (Catálogo) con paginación "Ver más" ----
+    // ---- Filtro de Productos (Catálogo) con paginación por páginas ----
     // Los filtros se inicializan después de que productos-api.js cargue las cards
     function inicializarFiltros() {
-        const filtros    = document.querySelectorAll('.catalogo__filtro');
+        const filtros          = document.querySelectorAll('.catalogo__filtro');
         const todasLasTarjetas = Array.from(document.querySelectorAll('.catalogo__grilla .tarjeta-producto'));
-        const resultado  = document.getElementById('catalogo__resultado');
-        const btnVerMas  = document.getElementById('btnVerMas');
+        const resultado        = document.getElementById('catalogo__resultado');
+        const contenedorPag   = document.getElementById('paginacion');
 
         if (filtros.length === 0 || todasLasTarjetas.length === 0) return;
 
-        const POR_PAGINA = 6;
-        let tarjetasFiltradas = todasLasTarjetas; // cards que coinciden con el filtro activo
-        let mostradas = 0;
+        let tarjetasFiltradas = todasLasTarjetas;
+        let paginaActual = 1;
+
+        // Calcula cuántos productos entran en 2 filas según las columnas actuales de la grilla
+        function calcularPorPagina() {
+            const grilla = document.getElementById('grillaProductos');
+            if (!grilla) return 8;
+            const columnas = getComputedStyle(grilla).gridTemplateColumns.split(' ').length;
+            return columnas * 2; // 2 filas
+        }
 
         function actualizarVista() {
-            todasLasTarjetas.forEach((t, i) => {
-                const enFiltro = tarjetasFiltradas.includes(t);
-                const visible  = enFiltro && tarjetasFiltradas.indexOf(t) < mostradas;
-                t.classList.toggle('oculto', !visible);
-                t.classList.toggle('mostrar', visible);
+            const porPagina    = calcularPorPagina();
+            const total        = tarjetasFiltradas.length;
+            const totalPaginas = Math.max(1, Math.ceil(total / porPagina));
+
+            // Ajustar página si quedó fuera de rango tras un cambio de filtro
+            if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+
+            const inicio = (paginaActual - 1) * porPagina;
+            const fin    = inicio + porPagina;
+
+            todasLasTarjetas.forEach(t => {
+                const idx     = tarjetasFiltradas.indexOf(t);
+                const visible = idx >= inicio && idx < fin;
+                t.classList.toggle('oculto',  !visible);
+                t.classList.toggle('mostrar',  visible);
             });
 
             if (resultado) {
-                const total = tarjetasFiltradas.length;
-                const shown = Math.min(mostradas, total);
-                resultado.innerHTML = `Mostrando <strong>${shown}</strong> de <strong>${total}</strong> producto${total !== 1 ? 's' : ''}`;
+                const mostrados = Math.min(fin, total) - inicio;
+                resultado.innerHTML = `Mostrando <strong>${mostrados}</strong> de <strong>${total}</strong> producto${total !== 1 ? 's' : ''}`;
             }
 
-            if (btnVerMas) {
-                btnVerMas.style.display = mostradas >= tarjetasFiltradas.length ? 'none' : 'block';
+            renderizarPaginacion(totalPaginas);
+        }
+
+        function renderizarPaginacion(totalPaginas) {
+            if (!contenedorPag) return;
+            if (totalPaginas <= 1) { contenedorPag.innerHTML = ''; return; }
+
+            let html = `<button class="paginacion__btn paginacion__btn--nav" id="pag-anterior" ${paginaActual === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                html += `<button class="paginacion__btn${i === paginaActual ? ' paginacion__btn--activo' : ''}" data-pagina="${i}">${i}</button>`;
             }
+
+            html += `<button class="paginacion__btn paginacion__btn--nav" id="pag-siguiente" ${paginaActual === totalPaginas ? 'disabled' : ''}>&#8250;</button>`;
+
+            contenedorPag.innerHTML = html;
+
+            contenedorPag.querySelector('#pag-anterior').addEventListener('click', () => {
+                if (paginaActual > 1) { paginaActual--; actualizarVista(); scrollAlCatalogo(); }
+            });
+            contenedorPag.querySelector('#pag-siguiente').addEventListener('click', () => {
+                if (paginaActual < totalPaginas) { paginaActual++; actualizarVista(); scrollAlCatalogo(); }
+            });
+            contenedorPag.querySelectorAll('[data-pagina]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    paginaActual = parseInt(btn.dataset.pagina);
+                    actualizarVista();
+                    scrollAlCatalogo();
+                });
+            });
+        }
+
+        function scrollAlCatalogo() {
+            document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function aplicarFiltro(categoria) {
             tarjetasFiltradas = categoria === 'todos'
                 ? todasLasTarjetas
                 : todasLasTarjetas.filter(t => t.dataset.categoria === categoria);
-            mostradas = Math.min(POR_PAGINA, tarjetasFiltradas.length);
+            paginaActual = 1;
             actualizarVista();
         }
 
@@ -130,14 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        if (btnVerMas) {
-            btnVerMas.addEventListener('click', () => {
-                mostradas = Math.min(mostradas + POR_PAGINA, tarjetasFiltradas.length);
-                actualizarVista();
-            });
-        }
+        // Recalcular al cambiar tamaño de pantalla (las columnas pueden cambiar)
+        window.addEventListener('resize', actualizarVista);
 
-        // Mostrar los primeros 6 al cargar
         aplicarFiltro('todos');
     }
 
