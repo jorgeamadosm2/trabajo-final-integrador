@@ -58,8 +58,10 @@ function agregarAlCarrito(producto) {
 
 /** Elimina completamente un producto del carrito por su ID. */
 function eliminarDelCarrito(id) {
-    const carrito = obtenerCarrito().filter(item => item.id !== id);
-    guardarCarrito(carrito);
+    const carrito = obtenerCarrito();
+    const item = carrito.find(i => i.id === id);
+    guardarCarrito(carrito.filter(i => i.id !== id));
+    if (item) mostrarNotificacion(`"${item.nombre}" eliminado del carrito`);
 }
 
 /**
@@ -178,23 +180,9 @@ function renderizarDropdownCarrito() {
 
 // ─── Toast de notificación ────────────────────────────────────────────────────
 
-/**
- * Muestra una notificación temporal (toast) en la esquina de la pantalla.
- * Se crea dinámicamente la primera vez y se reutiliza después.
- * Desaparece automáticamente a los 2.5 segundos.
- */
+/** Alias para compatibilidad interna — usa el sistema global de notificaciones. */
 function mostrarToast(mensaje) {
-    let toast = document.getElementById('carritoToast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'carritoToast';
-        toast.className = 'carrito__toast';
-        document.body.appendChild(toast);
-    }
-    toast.textContent = '✓ ' + mensaje;
-    toast.classList.add('carrito__toast--visible');
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(() => toast.classList.remove('carrito__toast--visible'), 2500);
+    mostrarNotificacion(mensaje);
 }
 
 // ─── Inicialización del widget del carrito en el navbar ───────────────────────

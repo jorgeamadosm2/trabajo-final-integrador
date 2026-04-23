@@ -15,6 +15,26 @@
 const API_BASE = "https://trabajo-final-integrador-58s4.onrender.com/api";
 
 /**
+ * Muestra una notificación tipo toast en la esquina superior derecha.
+ * @param {string} mensaje - Texto a mostrar
+ * @param {'exito'|'error'} tipo - Color del toast
+ */
+function mostrarNotificacion(mensaje, tipo = 'exito') {
+  let toast = document.getElementById('notifToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'notifToast';
+    document.body.appendChild(toast);
+  }
+  toast.className = `notif-toast notif-toast--${tipo}`;
+  toast.textContent = (tipo === 'exito' ? '✓ ' : '✕ ') + mensaje;
+  void toast.offsetWidth; // forzar reflow para reiniciar la transición
+  toast.classList.add('notif-toast--visible');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('notif-toast--visible'), 3200);
+}
+
+/**
  * Hace una petición HTTP a la API del backend.
  *
  * Agrega automáticamente el token JWT si existe en localStorage,

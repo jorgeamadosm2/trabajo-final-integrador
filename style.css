@@ -3219,6 +3219,30 @@ ul {
     transform: translateX(-50%) translateY(0);
 }
 
+/* Notificación global (éxito / error) */
+.notif-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    min-width: 240px;
+    max-width: 360px;
+    padding: 0.85rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+    transform: translateX(calc(100% + 32px));
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+.notif-toast--visible {
+    transform: translateX(0);
+}
+.notif-toast--exito  { background: #16a34a; }
+.notif-toast--error  { background: #dc2626; }
+
 /* ============================================
    PÁGINA DE PEDIDO
    ============================================ */
