@@ -1,3 +1,16 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# routes/contacto.py — Formulario de contacto y mensajes al negocio
+#
+# Endpoints:
+#   POST  /api/contacto          → enviar mensaje (público, sin login)
+#   GET   /api/contacto          → listar mensajes (solo admin)
+#   PATCH /api/contacto/<id>/leido → marcar como leído (solo admin)
+#   DELETE /api/contacto/<id>   → eliminar mensaje (solo admin)
+#
+# Cualquier visitante puede enviar un mensaje sin estar registrado.
+# Los mensajes no leídos muestran un badge rojo en el panel de admin.
+# ─────────────────────────────────────────────────────────────────────────────
+
 from flask import Blueprint, request, jsonify
 from bson.errors import InvalidId
 
@@ -9,7 +22,10 @@ contacto_bp = Blueprint("contacto", __name__, url_prefix="/api/contacto")
 
 
 def _validar_mensaje(data):
-    """Devuelve lista de errores o [] si todo OK."""
+    """
+    Valida los campos del formulario de contacto.
+    Devuelve una lista de mensajes de error, o [] si todo está correcto.
+    """
     errores = []
     if not data.get("nombre", "").strip():
         errores.append("El campo 'nombre' es requerido")
@@ -23,11 +39,26 @@ def _validar_mensaje(data):
     return errores
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ENVIAR MENSAJE (público)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @contacto_bp.post("")
 def enviar_mensaje():
     """
-    POST /api/contacto — guarda el formulario de contacto.
-    Body JSON: { "nombre": "...", "email": "...", "asunto": "...", "mensaje": "..." }
+    POST /api/contacto — Guarda un mensaje del formulario de contacto.
+
+    No requiere autenticación: cualquier visitante puede contactar al negocio.
+
+    Body JSON:
+    {
+      "nombre": "Ana García",
+      "email": "ana@example.com",
+      "asunto": "consulta",   ← opciones: consulta, mayorista, pedido, otro
+      "mensaje": "Quiero saber si tienen cuero de color azul..."
+    }
+
+    El mensaje queda guardado con leido=False hasta que el admin lo revise.
     """
     data = request.get_json()
     if not data:
@@ -51,10 +82,20 @@ def enviar_mensaje():
     }), 201
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LISTAR MENSAJES (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @contacto_bp.get("")
 @admin_required
 def listar_mensajes():
-    """GET /api/contacto — lista todos los mensajes (requiere JWT admin)."""
+    """
+    GET /api/contacto — Lista todos los mensajes recibidos.
+
+    Requiere: JWT de admin.
+    Query param opcional: ?no_leidos=true → solo los no leídos
+    Ordenados del más reciente al más antiguo.
+    """
     solo_no_leidos = request.args.get("no_leidos", "").lower() == "true"
     filtros = {}
     if solo_no_leidos:
@@ -68,10 +109,20 @@ def listar_mensajes():
     }), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MARCAR COMO LEÍDO (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @contacto_bp.patch("/<mensaje_id>/leido")
 @admin_required
 def marcar_leido(mensaje_id):
-    """PATCH /api/contacto/<id>/leido — marca un mensaje como leído (requiere JWT admin)."""
+    """
+    PATCH /api/contacto/<id>/leido — Marca un mensaje como leído.
+
+    Requiere: JWT de admin.
+    Al marcar como leído, el mensaje desaparece del contador de
+    notificaciones no leídas en el panel de administración.
+    """
     try:
         mensaje = MensajeContacto.objects(id=mensaje_id).first()
     except InvalidId:
@@ -85,10 +136,20 @@ def marcar_leido(mensaje_id):
     return jsonify({"ok": True, "mensaje": mensaje.to_dict()}), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ELIMINAR MENSAJE (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @contacto_bp.delete("/<mensaje_id>")
 @admin_required
 def eliminar_mensaje(mensaje_id):
-    """DELETE /api/contacto/<id> — elimina definitivamente un mensaje (requiere JWT admin)."""
+    """
+    DELETE /api/contacto/<id> — Elimina definitivamente un mensaje.
+
+    Requiere: JWT de admin.
+    Los mensajes de contacto SÍ se eliminan físicamente (no hay soft-delete)
+    porque no tienen relaciones con otros documentos.
+    """
     try:
         mensaje = MensajeContacto.objects(id=mensaje_id).first()
     except InvalidId:

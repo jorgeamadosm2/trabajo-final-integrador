@@ -1,17 +1,24 @@
 /**
- * contacto-api.js
- * Intercepta el formulario de contacto y envía los datos a la API.
- * Debe cargarse ANTES de main.js en contacto.html.
+ * contacto-api.js — Envío del formulario de contacto a la API
+ *
+ * Intercepta el submit del formulario en contacto.html y envía los datos
+ * al backend Flask vía POST /api/contacto.
+ *
+ * Comportamientos:
+ *   - Deshabilita el botón al enviar (evita doble submit)
+ *   - En éxito: reemplaza el formulario con un mensaje de confirmación
+ *   - En error: muestra el mensaje de error arriba del formulario
+ *     y re-habilita el botón para que el usuario pueda corregir y reintentar
  */
 
 document.addEventListener("DOMContentLoaded", () => {
   const formulario = document.getElementById("formularioContacto");
-  if (!formulario) return; // Solo corre en contacto.html
+  if (!formulario) return; // Solo se ejecuta en contacto.html
 
   formulario.addEventListener("submit", async (evento) => {
-    evento.preventDefault(); // Evitar que el navegador recargue la página
+    evento.preventDefault(); // Evitar que el navegador recargue la página al enviar
 
-    // Leer los valores del formulario
+    // Leer los valores actuales de los campos del formulario
     const datos = {
       nombre:  formulario.querySelector('[name="nombre"]').value.trim(),
       email:   formulario.querySelector('[name="email"]').value.trim(),
@@ -19,19 +26,20 @@ document.addEventListener("DOMContentLoaded", () => {
       mensaje: formulario.querySelector('[name="mensaje"]').value.trim(),
     };
 
-    // Deshabilitar el botón para evitar doble envío
+    // Deshabilitar el botón de envío para prevenir múltiples envíos
     const botonEnviar = formulario.querySelector('[type="submit"]');
     const textoOriginal = botonEnviar.textContent;
     botonEnviar.disabled = true;
     botonEnviar.textContent = "Enviando...";
 
     try {
+      // Enviar los datos como JSON al backend
       await apiFetch("/contacto", {
         method: "POST",
         body: JSON.stringify(datos),
       });
 
-      // Éxito: reemplazar el formulario con un mensaje de confirmación
+      // Éxito: reemplazar todo el formulario con una confirmación visual
       formulario.innerHTML = `
         <div style="
           text-align: center;
@@ -49,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
     } catch (error) {
-      // Error: mostrar mensaje arriba del formulario
+      // Error: mostrar mensaje encima del formulario sin borrarlo
       let mensajeError = document.getElementById("error-formulario");
       if (!mensajeError) {
         mensajeError = document.createElement("div");
@@ -66,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       mensajeError.textContent = `Error: ${error.message}. Verificá los datos e intentá de nuevo.`;
 
-      // Rehabilitar el botón
+      // Rehabilitar el botón para que el usuario pueda corregir y reintentar
       botonEnviar.disabled = false;
       botonEnviar.textContent = textoOriginal;
     }

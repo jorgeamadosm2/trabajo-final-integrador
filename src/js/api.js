@@ -1,27 +1,45 @@
 /**
- * api.js — Cliente central para comunicarse con el backend Flask.
- * Todos los demás archivos JS usan esta función para hacer peticiones.
+ * api.js — Cliente HTTP centralizado para comunicarse con el backend Flask.
+ *
+ * TODOS los archivos JS que necesiten datos del servidor usan esta función.
+ * Centralizar las peticiones aquí permite:
+ *   - Agregar el token JWT automáticamente en cada petición autenticada
+ *   - Manejar errores de autenticación (401) en un solo lugar
+ *   - Cambiar la URL base del servidor sin tocar otros archivos
+ *
+ * Orden de carga en los HTML: api.js debe cargarse PRIMERO, antes de
+ * auth.js, productos-api.js, carrito.js, etc.
  */
 
+// URL base del backend. En desarrollo local cambiar a: http://127.0.0.1:5000/api
 const API_BASE = "https://trabajo-final-integrador-58s4.onrender.com/api";
 
 /**
- * Hace una petición HTTP a la API.
- * Agrega automáticamente el token JWT si existe en localStorage.
+ * Hace una petición HTTP a la API del backend.
  *
- * @param {string} path  - Ruta relativa, ej: "/productos"
- * @param {object} opciones - Opciones de fetch (method, body, etc.)
- * @returns {Promise<object>} - La respuesta JSON de la API
+ * Agrega automáticamente el token JWT si existe en localStorage,
+ * y maneja el caso de token expirado redirigiendo al login.
+ *
+ * @param {string} path      - Ruta relativa al endpoint, ej: "/productos"
+ * @param {object} opciones  - Opciones de fetch: method, body, headers adicionales
+ * @returns {Promise<object>} - El objeto JSON devuelto por la API
+ * @throws {Error}           - Si la respuesta no es OK (status >= 400)
+ *
+ * Ejemplos de uso:
+ *   const datos = await apiFetch("/productos");
+ *   const nuevo = await apiFetch("/productos", { method: "POST", body: JSON.stringify({...}) });
  */
 async function apiFetch(path, opciones = {}) {
+  // Obtener el token JWT guardado al iniciar sesión
   const token = localStorage.getItem("admin_token");
 
   const headers = {
     "Content-Type": "application/json",
-    ...opciones.headers,
+    ...opciones.headers,  // Permitir headers adicionales del llamador
   };
 
-  // Si hay un token guardado, lo agrega al header de autorización
+  // Si hay un token, incluirlo como Bearer token en el header de autorización
+  // El backend Flask-JWT verifica este header en cada ruta protegida
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -30,15 +48,17 @@ async function apiFetch(path, opciones = {}) {
   const datos = await respuesta.json();
 
   if (!respuesta.ok) {
-    // Token vencido o inválido: cerrar sesión y redirigir al login
-    if (respuesta.status === 401) {
+    // 401 = Token vencido, inválido o ausente.
+    // Si estamos en la página de login el 401 significa credenciales incorrectas,
+    // no token expirado, así que dejamos que el formulario maneje el error.
+    if (respuesta.status === 401 && !window.location.pathname.includes("login.html")) {
       localStorage.removeItem("admin_token");
       localStorage.removeItem("usuario_data");
       const enPages = window.location.pathname.includes("/pages/");
       window.location.href = (enPages ? "../" : "") + "pages/login.html";
       return;
     }
-    // Lanza un error con el mensaje que devuelve la API
+    // Para otros errores (400, 401 en login, 403, 404, 500), lanzar el mensaje que envió la API
     throw new Error(datos.error || datos.errores?.join(", ") || "Error en la API");
   }
 

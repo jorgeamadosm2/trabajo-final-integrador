@@ -1,3 +1,19 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# routes/productos.py — CRUD de productos del catálogo
+#
+# Este blueprint expone los endpoints para:
+#   GET    /api/productos            → listar productos (público)
+#   GET    /api/productos/destacados → productos para la home (público)
+#   GET    /api/productos/<id>       → detalle de un producto (público)
+#   POST   /api/productos            → crear producto (solo admin)
+#   PUT    /api/productos/<id>       → editar producto (solo admin)
+#   DELETE /api/productos/<id>       → soft-delete (solo admin)
+#
+# Patrón SOFT-DELETE: eliminar un producto solo pone activo=False.
+# El producto desaparece del catálogo público pero queda en la BD
+# para preservar el historial de pedidos que lo referencian.
+# ─────────────────────────────────────────────────────────────────────────────
+
 from flask import Blueprint, request, jsonify
 from bson.errors import InvalidId
 from datetime import datetime
@@ -10,7 +26,11 @@ productos_bp = Blueprint("productos", __name__, url_prefix="/api/productos")
 
 
 def _validar_producto(data):
-    """Valida los campos del body. Devuelve lista de errores o [] si todo OK."""
+    """
+    Valida los campos del body al crear o editar un producto.
+    Devuelve una lista de mensajes de error, o [] si todo está correcto.
+    Al centralizar la validación aquí evitamos repetir código en POST y PUT.
+    """
     errores = []
     if not data.get("nombre", "").strip():
         errores.append("El campo 'nombre' es requerido")
@@ -28,19 +48,28 @@ def _validar_producto(data):
     return errores
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LISTAR PRODUCTOS
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.get("")
 def listar_productos():
     """
-    GET /api/productos
+    GET /api/productos — Devuelve los productos del catálogo.
+
     Query params opcionales:
-      ?categoria=materia-prima|elaborados|herramientas
-      ?destacado=true
-      ?todos=true  (solo admin con JWT — muestra también los inactivos)
+      ?categoria=materia-prima|elaborados|herramientas  → filtrar por sección
+      ?destacado=true                                    → solo los destacados
+      ?todos=true                                        → incluir inactivos (solo admin con JWT)
+
+    El parámetro ?todos=true permite al panel de admin ver los productos
+    desactivados para poder restaurarlos. Si lo pasa un usuario sin JWT
+    de admin, se ignora y solo se muestran los activos.
     """
     from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
     from models import Usuario
 
-    # Si el admin pasa ?todos=true y tiene JWT válido, mostrar todos (activos e inactivos)
+    # Verificar si el admin quiere ver todos (activos + inactivos)
     mostrar_todos = request.args.get("todos", "").lower() == "true"
     if mostrar_todos:
         try:
@@ -52,7 +81,10 @@ def listar_productos():
         except Exception:
             mostrar_todos = False
 
+    # Si no es admin con ?todos=true, solo mostrar los activos
     filtros = {} if mostrar_todos else {"activo": True}
+
+    # Aplicar filtros opcionales de categoría y destacado
     categoria = request.args.get("categoria")
     destacado  = request.args.get("destacado")
 
@@ -72,9 +104,16 @@ def listar_productos():
     }), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PRODUCTOS DESTACADOS (para la home)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.get("/destacados")
 def productos_destacados():
-    """GET /api/productos/destacados — devuelve los 3 primeros productos destacados."""
+    """
+    GET /api/productos/destacados — Devuelve hasta 3 productos marcados como
+    destacados para mostrar en la sección de la página principal (index.html).
+    """
     productos = Producto.objects(activo=True, destacado=True).limit(3)
     return jsonify({
         "ok": True,
@@ -82,9 +121,16 @@ def productos_destacados():
     }), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# DETALLE DE UN PRODUCTO
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.get("/<producto_id>")
 def obtener_producto(producto_id):
-    """GET /api/productos/<id> — un producto por su ID de MongoDB."""
+    """
+    GET /api/productos/<id> — Devuelve los datos de un producto específico
+    buscándolo por su ObjectId de MongoDB.
+    """
     try:
         producto = Producto.objects(id=producto_id, activo=True).first()
     except InvalidId:
@@ -96,10 +142,20 @@ def obtener_producto(producto_id):
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# CREAR PRODUCTO (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.post("")
 @admin_required
 def crear_producto():
-    """POST /api/productos — crea un nuevo producto (requiere JWT admin)."""
+    """
+    POST /api/productos — Crea un nuevo producto en el catálogo.
+
+    Requiere: JWT de admin en el header Authorization.
+    Body JSON con los campos del producto (ver _validar_producto).
+    Guarda una referencia al admin que creó el producto (FK → usuarios).
+    """
     from flask_jwt_extended import get_jwt_identity
     from models import Usuario
 
@@ -111,7 +167,7 @@ def crear_producto():
     if errores:
         return jsonify({"ok": False, "errores": errores}), 400
 
-    # Obtener el admin que está creando el producto (relación FK explícita)
+    # Obtener el admin para registrar quién creó el producto (relación FK)
     admin = Usuario.objects(id=get_jwt_identity()).first()
 
     stock_raw = data.get("stock")
@@ -131,10 +187,20 @@ def crear_producto():
     return jsonify({"ok": True, "producto": producto.to_dict()}), 201
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# EDITAR PRODUCTO (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.put("/<producto_id>")
 @admin_required
 def editar_producto(producto_id):
-    """PUT /api/productos/<id> — actualiza un producto (requiere JWT admin)."""
+    """
+    PUT /api/productos/<id> — Actualiza todos los campos de un producto.
+
+    Requiere: JWT de admin.
+    Se puede usar también para RESTAURAR un producto desactivado enviando
+    { "activo": true } junto con los campos requeridos.
+    """
     try:
         producto = Producto.objects(id=producto_id).first()
     except InvalidId:
@@ -163,18 +229,29 @@ def editar_producto(producto_id):
     producto.stock       = int(stock_raw) if stock_raw is not None else None
     if "activo" in data:
         producto.activo  = bool(data["activo"])
-    producto.updated_at  = datetime.utcnow()
+    producto.updated_at  = datetime.utcnow()  # Actualizar timestamp de modificación
     producto.save()
 
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ELIMINAR PRODUCTO — SOFT DELETE (solo admin)
+# ─────────────────────────────────────────────────────────────────────────────
+
 @productos_bp.delete("/<producto_id>")
 @admin_required
 def eliminar_producto(producto_id):
     """
-    DELETE /api/productos/<id> — soft-delete: pone activo=False (requiere JWT admin).
-    El producto queda en Atlas pero no aparece en el listado público.
+    DELETE /api/productos/<id> — Desactiva un producto (soft-delete).
+
+    Requiere: JWT de admin.
+
+    NO borra el documento de MongoDB. Solo pone activo=False para que
+    no aparezca en el catálogo público. Esto preserva el historial de
+    pedidos que referencian este producto por nombre/precio.
+
+    Para restaurar un producto desactivado, usar PUT con { "activo": true }.
     """
     try:
         producto = Producto.objects(id=producto_id, activo=True).first()
@@ -184,6 +261,7 @@ def eliminar_producto(producto_id):
     if not producto:
         return jsonify({"ok": False, "error": "Producto no encontrado"}), 404
 
+    # Soft-delete: solo cambiar el flag, no hacer .delete()
     producto.activo = False
     producto.updated_at = datetime.utcnow()
     producto.save()

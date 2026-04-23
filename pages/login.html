@@ -136,6 +136,13 @@
                 return;
             }
 
+            const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!emailValido) {
+                errorDiv.textContent = "Ingresá un correo electrónico válido (ejemplo: usuario@dominio.com).";
+                errorDiv.style.display = "block";
+                return;
+            }
+
             btnSubmit.disabled = true;
             btnSubmit.textContent = "Ingresando...";
 
