@@ -232,7 +232,8 @@ async function guardarProducto(e) {
             await apiFetch("/productos", { method: "POST", body: JSON.stringify(payload) });
         }
         cancelarFormulario();
-        await cargarProductos(); // recargar la lista
+        await cargarProductos();
+        mostrarNotificacion(modoEdicion ? "Producto actualizado correctamente" : "Producto creado correctamente");
     } catch (error) {
         errorDiv.textContent = error.message;
         errorDiv.style.display = "block";
@@ -259,8 +260,9 @@ async function toggleActivo(id, estadoActual) {
             });
         }
         await cargarProductos();
+        mostrarNotificacion(`Producto ${estadoActual ? "desactivado" : "restaurado"} correctamente`);
     } catch (e) {
-        alert("Error: " + e.message);
+        mostrarNotificacion("Error: " + e.message, "error");
     }
 }
 
@@ -365,8 +367,9 @@ async function marcarLeido(id, btn) {
         } else {
             badge.style.display = "none";
         }
+        mostrarNotificacion("Mensaje marcado como leído");
     } catch (e) {
-        alert("Error: " + e.message);
+        mostrarNotificacion("Error: " + e.message, "error");
     }
 }
 
@@ -390,8 +393,9 @@ async function eliminarMensaje(id) {
             document.getElementById("listaMensajes").innerHTML =
                 `<p class="admin__vacio">No hay mensajes para mostrar.</p>`;
         }
+        mostrarNotificacion("Mensaje eliminado");
     } catch (e) {
-        alert("Error al eliminar: " + e.message);
+        mostrarNotificacion("Error al eliminar: " + e.message, "error");
     }
 }
 
@@ -480,6 +484,7 @@ async function guardarUsuario(e) {
         await apiFetch(`/auth/usuarios/${id}`, { method: "PUT", body: JSON.stringify(payload) });
         cancelarFormUsuario();
         await cargarUsuarios();
+        mostrarNotificacion("Usuario actualizado correctamente");
     } catch (error) {
         errorDiv.textContent = error.message;
         errorDiv.style.display = "block";
@@ -499,8 +504,9 @@ async function toggleEstadoUsuario(id, estadoActual) {
             body: JSON.stringify({ activo: !estadoActual })
         });
         await cargarUsuarios();
+        mostrarNotificacion(`Usuario ${estadoActual ? "dado de baja" : "reactivado"} correctamente`);
     } catch (e) {
-        alert("Error: " + e.message);
+        mostrarNotificacion("Error: " + e.message, "error");
     }
 }
 
@@ -591,9 +597,10 @@ async function toggleEstadoPedido(id, nuevoEstado) {
             method: "PATCH",
             body: JSON.stringify({ estado: nuevoEstado }),
         });
-        await cargarPedidos(); // recargar desde la API para reflejar el cambio
+        await cargarPedidos();
+        mostrarNotificacion(`Pedido marcado como ${nuevoEstado}`);
     } catch (e) {
-        alert("Error al cambiar el estado: " + e.message);
+        mostrarNotificacion("Error al cambiar el estado: " + e.message, "error");
     }
 }
 
@@ -602,8 +609,9 @@ async function eliminarPedido(id, numero) {
     try {
         await apiFetch(`/pedidos/${id}`, { method: "DELETE" });
         await cargarPedidos();
+        mostrarNotificacion(`Pedido ${numero} eliminado`);
     } catch (e) {
-        alert("Error al eliminar: " + e.message);
+        mostrarNotificacion("Error al eliminar: " + e.message, "error");
     }
 }
 

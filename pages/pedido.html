@@ -200,6 +200,8 @@
                     aviso.textContent = 'Tu pedido fue registrado. Envianos el comprobante de pago para procesarlo.';
                     btn.parentNode.insertBefore(aviso, btn.nextSibling);
 
+                    mostrarNotificacion('¡Pedido confirmado correctamente!');
+
                 } catch (err) {
                     // Si la API falla, mostrar el error y re-habilitar el botón
                     btn.disabled = false;
