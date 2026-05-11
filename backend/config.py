@@ -11,6 +11,7 @@ class Config:
 
     DEBUG = os.environ.get("FLASK_ENV") == "development"
 
+    # Código que el usuario debe ingresar en el registro para obtener rol admin
     ADMIN_SECRET_CODE = os.environ.get("ADMIN_SECRET_CODE", "cuerar-admin-2024")
 
     # URL base del frontend para armar el link de reset de contraseña

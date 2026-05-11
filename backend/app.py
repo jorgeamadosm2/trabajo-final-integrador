@@ -14,6 +14,7 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
 
+    # "null" cubre los archivos HTML abiertos directamente en el browser (file://)
     CORS(app, resources={r"/api/*": {"origins": [
         "http://127.0.0.1:5500",
         "http://localhost:5500",
@@ -23,6 +24,7 @@ def create_app():
         "https://trabajo-final-integrador-coral.vercel.app",
     ]}})
 
+    # Importar adentro de create_app para evitar imports circulares con los modelos
     from routes import register_blueprints
     register_blueprints(app)
 

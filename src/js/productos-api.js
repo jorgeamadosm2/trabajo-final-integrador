@@ -95,7 +95,8 @@ async function cargarDestacados() {
   try {
     const datos = await apiFetch("/productos/destacados");
 
-    // Ajustar rutas de imagen para index.html (sin "../")
+    // index.html está en la raíz, las imágenes vienen con "../src/img/" del seed — hay que limpiarlas
+
     const productosAdaptados = datos.productos.map((p) => ({
       ...p,
       imagen_url: p.imagen_url

@@ -32,6 +32,7 @@ def listar_productos():
     from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
     from models import Usuario
 
+    # ?todos=true devuelve productos inactivos; solo lo respetamos si el token es de admin
     mostrar_todos = request.args.get("todos", "").lower() == "true"
     if mostrar_todos:
         try:

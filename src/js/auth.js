@@ -26,10 +26,12 @@ function esAdmin() {
   return usuario ? usuario.es_admin === true : false;
 }
 
+// Devuelve "../" si estamos dentro de /pages/, "" si estamos en la raíz
 function getPrefijo() {
   return window.location.pathname.includes("/pages/") ? "../" : "";
 }
 
+// Llena #navAuth con el botón de login o los datos del usuario según la sesión
 function inicializarNavbar() {
   const contenedor = document.getElementById("navAuth");
   if (!contenedor) return;

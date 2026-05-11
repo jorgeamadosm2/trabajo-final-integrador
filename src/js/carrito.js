@@ -97,6 +97,7 @@ function renderizarDropdownCarrito() {
         </div>
     `).join('');
 
+    // Si no hay sesión, el botón "Comprar" redirige al login en vez de al pedido
     if (typeof estaLogueado === 'function' && !estaLogueado()) {
         const urlLogin = esPaginaRaiz ? 'pages/login.html' : 'login.html';
         footerEl.innerHTML = `
