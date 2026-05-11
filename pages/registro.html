@@ -33,6 +33,7 @@
                     <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js lo llena -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -108,7 +109,7 @@
                     >
                 </div>
 
-                <!-- Sección de código admin (opcional) -->
+                <!-- Sección colapsable, solo la ve quien sabe que existe -->
                 <details class="auth-card__admin-toggle">
                     <summary>¿Sos administrador?</summary>
                     <div class="campo" style="margin-top: 10px;">
@@ -206,7 +207,7 @@
                     body: JSON.stringify({ nombre, email, password, codigo_admin: codigoAdmin })
                 });
 
-                // 2. Login automático
+                // Login automático para no tener que pedir que inicien sesión justo después de registrarse
                 const loginData = await apiFetch("/auth/login", {
                     method: "POST",
                     body: JSON.stringify({ email, password })

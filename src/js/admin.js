@@ -1,16 +1,9 @@
-/**
- * admin.js — Lógica del Panel de Administración.
- * Requiere: api.js y auth.js cargados antes.
- */
-
-// ─── Estado global del panel ──────────────────────────────────────────────────
 let todosLosProductos = [];  // cache de productos cargados
 let filtroCategoriaActual = "";
 let modoEdicion = false;     // false = agregar, true = editar
 let todosUsuarios = [];      // cache de usuarios cargados
 let todosPedidos  = [];      // cache de pedidos (MongoDB via API)
 
-// ─── Inicialización ───────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Verificar que el usuario sea admin
@@ -29,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("formUsuario").addEventListener("submit", guardarUsuario);
 });
 
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 function mostrarTab(tab) {
     const secciones = {
@@ -66,7 +58,6 @@ function mostrarTab(tab) {
     if (tab === "dashboard") renderizarDashboard();
 }
 
-// ─── PRODUCTOS ────────────────────────────────────────────────────────────────
 
 async function cargarProductos() {
     try {
@@ -150,7 +141,6 @@ function filtrarAdmin(btn, categoria) {
     renderizarTablaProductos(filtrados);
 }
 
-// ─── Formulario producto ──────────────────────────────────────────────────────
 
 function toggleFormulario() {
     const form = document.getElementById("formularioProducto");
@@ -266,7 +256,6 @@ async function toggleActivo(id, estadoActual) {
     }
 }
 
-// ─── MENSAJES ─────────────────────────────────────────────────────────────────
 
 let todosMensajes = [];
 
@@ -399,7 +388,6 @@ async function eliminarMensaje(id) {
     }
 }
 
-// ─── USUARIOS ─────────────────────────────────────────────────────────────────
 
 async function cargarUsuarios() {
     try {
@@ -510,7 +498,6 @@ async function toggleEstadoUsuario(id, estadoActual) {
     }
 }
 
-// ─── PEDIDOS ──────────────────────────────────────────────────────────────────
 
 async function cargarPedidos() {
     try {
@@ -615,7 +602,6 @@ async function eliminarPedido(id, numero) {
     }
 }
 
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 
 function renderizarDashboard() {
     const ahora      = new Date();
@@ -792,7 +778,6 @@ function renderizarDashboard() {
         : `<p class="admin__vacio">No hay productos con stock crítico.</p>`;
 }
 
-// ─── Utilidades ───────────────────────────────────────────────────────────────
 
 function formatearFecha(isoString) {
     const fecha = new Date(isoString);
@@ -800,7 +785,6 @@ function formatearFecha(isoString) {
         + " " + fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 }
 
-// ─── Exportación CSV ──────────────────────────────────────────────────────────
 
 /**
  * Genera y descarga un archivo CSV a partir de un array de filas.

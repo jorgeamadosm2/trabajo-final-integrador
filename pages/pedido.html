@@ -34,6 +34,7 @@
                     <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js lo llena -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -55,7 +56,7 @@
 
             <div class="pedido__grilla">
 
-                <!-- Resumen del pedido -->
+                <!-- Resumen del pedido (se llena con el carrito en localStorage) -->
                 <div class="pedido__card">
                     <h2 class="pedido__card-titulo">Resumen del Pedido</h2>
                     <div id="resumenItems" class="pedido__items-lista"></div>
@@ -65,7 +66,7 @@
                     </div>
                 </div>
 
-                <!-- Datos de pago -->
+                <!-- Datos de pago fijos, no vienen de la API -->
                 <div class="pedido__card">
                     <h2 class="pedido__card-titulo">Datos de Pago</h2>
                     <p class="pedido__pago-instruccion">
@@ -138,7 +139,7 @@
     <script src="../src/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Solo usuarios registrados pueden hacer pedidos
+            // Redirigir si llegó sin sesión (no debería pasar porque el carrito ya avisa)
             if (!estaLogueado()) {
                 window.location.href = 'login.html';
                 return;
@@ -146,7 +147,7 @@
 
             const CARRITO_KEY = 'cuerar_carrito';
 
-            // Generar número de pedido
+            // Número único generado en el cliente con los últimos 6 dígitos del timestamp
             const numeroPedido = 'CT-' + Date.now().toString().slice(-6);
             document.getElementById('numeroPedido').textContent = '#' + numeroPedido;
 
@@ -190,7 +191,7 @@
                         }),
                     });
 
-                    // Éxito: limpiar carrito y mostrar confirmación
+                    // Limpiar el carrito una vez que el pedido quedó guardado en la API
                     localStorage.removeItem(CARRITO_KEY);
                     btn.textContent = '✓ Pedido Confirmado';
                     btn.style.background = 'var(--color-whatsapp)';

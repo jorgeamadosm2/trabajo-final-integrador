@@ -6,6 +6,7 @@
     <meta name="description" content="CUERAR TUCUMÁN - Tienda de materia prima y productos elaborados en cuero. Encontrá los mejores cueros y artículos artesanales en Tucumán.">
     <title>CUERAR TUCUMÁN | Cuero Premium en Tucumán</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Fuentes: Playfair para títulos, Inter para texto general -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +23,7 @@
                 </div>
             </a>
 
+            <!-- Botón hamburguesa, solo visible en mobile (main.js lo maneja) -->
             <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
                 <span></span>
                 <span></span>
@@ -35,6 +37,7 @@
                     <li><a href="pages/sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="pages/contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js inyecta acá el botón de login o el nombre del usuario -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -42,6 +45,7 @@
 
     <!-- ======== PORTADA ======== -->
     <section class="portada" id="portada">
+        <!-- Capa oscura sobre la imagen de fondo para que el texto sea legible -->
         <div class="portada__capa"></div>
         <div class="portada__contenido">
             <p class="portada__subtitulo">Desde Tucumán para todo el país</p>
@@ -54,6 +58,7 @@
                 <a href="pages/contacto.html" class="boton boton--secundario" id="portadaAccionSecundaria">Contactanos</a>
             </div>
         </div>
+        <!-- Flechita de scroll para indicar que hay más contenido abajo -->
         <div class="portada__indicador-scroll">
             <span>Descubrí más</span>
             <div class="portada__flecha-scroll"></div>
@@ -61,6 +66,7 @@
     </section>
 
     <!-- ======== BENEFICIOS ======== -->
+    <!-- 4 tarjetas que resumen por qué elegirnos -->
     <section class="beneficios" id="beneficios">
         <div class="contenedor">
             <div class="beneficios__grilla">
@@ -89,6 +95,7 @@
     </section>
 
     <!-- ======== CATEGORÍAS ======== -->
+    <!-- Cada tarjeta lleva al catálogo completo, no a una categoría filtrada -->
     <section class="categorias" id="categorias">
         <div class="contenedor">
             <div class="encabezado-seccion">
@@ -135,11 +142,13 @@
     </section>
 
     <!-- ======== SOBRE NOSOTROS (VISTA PREVIA) ======== -->
+    <!-- Pequeño resumen de la empresa; la página completa está en sobre-nosotros.html -->
     <section class="vista-nosotros" id="vistaNosotros">
         <div class="contenedor">
             <div class="vista-nosotros__grilla">
                 <div class="vista-nosotros__contenedor-imagen">
                     <img src="src/img/hero-banner.png" alt="Taller artesanal de cuero CUERAR TUCUMÁN" class="vista-nosotros__imagen" loading="lazy">
+                    <!-- Badge "+20 años" encima de la imagen -->
                     <div class="vista-nosotros__insignia">
                         <span class="vista-nosotros__insignia-numero">+20</span>
                         <span class="vista-nosotros__insignia-texto">Años de experiencia</span>
@@ -150,11 +159,11 @@
                     <h2 class="encabezado-seccion__titulo">Tradición en Cuero</h2>
                     <div class="encabezado-seccion__divisor encabezado-seccion__divisor--izquierda"></div>
                     <p class="vista-nosotros__texto">
-                        En <strong>CUERAR TUCUMÁN</strong> combinamos la tradición artesanal con los más altos estándares de calidad. 
+                        En <strong>CUERAR TUCUMÁN</strong> combinamos la tradición artesanal con los más altos estándares de calidad.
                         Somos una empresa tucumana dedicada a la venta de materia prima y productos elaborados en cuero genuino.
                     </p>
                     <p class="vista-nosotros__texto">
-                        Trabajamos con los mejores curtidores del país para ofrecerte cueros de primera calidad, 
+                        Trabajamos con los mejores curtidores del país para ofrecerte cueros de primera calidad,
                         y nuestros artesanos crean productos únicos que combinan diseño moderno con técnicas tradicionales.
                     </p>
                     <ul class="vista-nosotros__lista">
@@ -177,7 +186,7 @@
                 <h2 class="encabezado-seccion__titulo">Productos Destacados</h2>
                 <div class="encabezado-seccion__divisor"></div>
             </div>
-            <!-- Las cards se cargan dinámicamente desde la API por productos-api.js -->
+            <!-- productos-api.js llena esta grilla con los productos marcados como destacados -->
             <div class="destacados__grilla"></div>
             <div class="destacados__accion">
                 <a href="pages/productos.html" class="boton boton--contorno" id="botonTodosProductos">Ver Todos los Productos</a>
@@ -186,6 +195,7 @@
     </section>
 
     <!-- ======== TESTIMONIOS ======== -->
+    <!-- Fijos por ahora, no vienen de la API -->
     <section class="testimonios" id="testimonios">
         <div class="contenedor">
             <div class="encabezado-seccion">
@@ -232,6 +242,7 @@
     </section>
 
     <!-- ======== BANNER DE ACCIÓN ======== -->
+    <!-- CTA final antes del footer, con link al formulario y al WhatsApp -->
     <section class="banner-accion" id="bannerAccion">
         <div class="banner-accion__capa"></div>
         <div class="contenedor">
@@ -261,7 +272,7 @@
                         </div>
                     </a>
                     <p class="pie__descripcion">
-                        Venta de materia prima y productos elaborados en cuero de primera calidad. 
+                        Venta de materia prima y productos elaborados en cuero de primera calidad.
                         Más de 20 años de experiencia en el rubro.
                     </p>
                 </div>
@@ -306,11 +317,12 @@
         </div>
     </footer>
 
-    <!-- ======== BOTÓN FLOTANTE WHATSAPP ======== -->
+    <!-- Botón flotante de WhatsApp, siempre visible en todas las páginas -->
     <a href="https://wa.me/5493865234570" class="whatsapp-flotante" id="whatsappFlotante" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
         💬
     </a>
 
+    <!-- Scripts: el orden importa, api.js y auth.js tienen que ir primero -->
     <script src="src/js/api.js"></script>
     <script src="src/js/auth.js"></script>
     <script src="src/js/carrito.js"></script>
