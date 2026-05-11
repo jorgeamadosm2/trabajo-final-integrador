@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js para los gráficos del dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -31,6 +32,7 @@
                     <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js inyecta acá el nombre del usuario y el botón salir -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -46,7 +48,7 @@
                     <h1 class="admin__banner-titulo">Administración</h1>
                     <p class="admin__banner-subtitulo">Gestioná los productos, mensajes y usuarios de CUERAR TUCUMÁN</p>
                 </div>
-                <!-- Estadísticas rápidas -->
+                <!-- Stats del banner: admin.js muestra solo las del tab activo según data-tab -->
                 <div class="admin__stats" id="adminStats">
                     <!-- Tab: Productos -->
                     <div class="admin__stat" data-tab="productos">
@@ -201,7 +203,7 @@
                     </div>
                 </div>
 
-                <!-- Formulario agregar/editar (oculto por defecto) -->
+                <!-- Formulario oculto: se muestra al hacer clic en "Agregar" o "Editar" -->
                 <div class="admin__formulario-card" id="formularioProducto" style="display:none;">
                     <h3 class="admin__form-titulo" id="formTitulo">Agregar Producto</h3>
                     <div id="formError" class="auth-card__error" style="display:none;"></div>
@@ -262,6 +264,7 @@
                                 <input type="checkbox" id="pDestacado">
                                 Mostrar como destacado en Inicio
                             </label>
+                            <!-- Solo se muestra en modo edición, no al crear -->
                             <label class="admin__check-label" id="checkActivoLabel" style="display:none;">
                                 <input type="checkbox" id="pActivo" checked>
                                 Producto activo (visible al público)
@@ -320,7 +323,7 @@
                     <button class="boton boton--contorno" onclick="exportarUsuarios()">⬇ Exportar CSV</button>
                 </div>
 
-                <!-- Formulario de edición de usuario (oculto por defecto) -->
+                <!-- Formulario de edición, aparece al hacer clic en "Editar" en la tabla -->
                 <div class="admin__formulario-card" id="formularioUsuario" style="display:none;">
                     <h3 class="admin__form-titulo">Editar Usuario</h3>
                     <div id="formUsuarioError" class="auth-card__error" style="display:none;"></div>
@@ -376,6 +379,7 @@
         </div>
     </main>
 
+    <!-- No se carga carrito.js ni productos-api.js, no se necesitan en el panel -->
     <script src="../src/js/api.js"></script>
     <script src="../src/js/auth.js"></script>
     <script src="../src/js/admin.js"></script>

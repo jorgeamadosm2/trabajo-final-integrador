@@ -51,7 +51,7 @@
             <div class="auth-card__error" id="authError" style="display:none;"></div>
             <div class="auth-card__exito" id="authExito" style="display:none;"></div>
 
-            <!-- Se muestra si el token es inválido/expirado -->
+            <!-- Si el token no está en la URL o expiró, se oculta el form y se muestra esto -->
             <div id="tokenInvalido" style="display:none;text-align:center;padding:16px;">
                 <p style="color:#c0392b;margin-bottom:16px;">El link es inválido o ha expirado.</p>
                 <a href="recuperar-contrasena.html" class="boton boton--primario">Solicitar nuevo link</a>
@@ -114,7 +114,7 @@
     <script src="../src/js/api.js"></script>
     <script src="../src/js/auth.js"></script>
     <script>
-        // Leer token desde la URL
+        // El token llega por URL: nueva-contrasena.html?token=xxx (lo genera el backend)
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
 
@@ -182,6 +182,7 @@
                 exitoDiv.style.display = "block";
                 document.getElementById("formNuevaContrasena").style.display = "none";
 
+                // Redirigir al login después de 2.5 segundos para que el usuario lea el mensaje
                 setTimeout(() => {
                     window.location.href = "login.html";
                 }, 2500);

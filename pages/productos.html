@@ -22,6 +22,7 @@
                 </div>
             </a>
 
+            <!-- Hamburguesa para mobile -->
             <button class="encabezado__boton-menu" id="botonMenu" aria-label="Abrir menú">
                 <span></span>
                 <span></span>
@@ -35,6 +36,7 @@
                     <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js inyecta acá login o datos del usuario -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -54,6 +56,7 @@
         <div class="contenedor">
 
             <div class="catalogo__barra-filtros">
+                <!-- Los números entre paréntesis se actualizan con los datos reales de la API (main.js) -->
                 <div class="catalogo__filtros" id="filtros">
                     <button class="catalogo__filtro activo" data-filtro="todos">
                         <span class="catalogo__filtro-icono">◈</span>
@@ -76,16 +79,14 @@
                         <span class="catalogo__filtro-cuenta">4</span>
                     </button>
                 </div>
+                <!-- Texto "Mostrando X de Y productos", lo actualiza main.js al paginar/filtrar -->
                 <p class="catalogo__resultado" id="catalogo__resultado">Mostrando <strong>12</strong> productos</p>
             </div>
 
-            <!-- ======== GRILLA DE PRODUCTOS ======== -->
-            <!-- Las cards se cargan dinámicamente desde la API por productos-api.js -->
-            <div class="catalogo__grilla" id="grillaProductos">
+            <!-- productos-api.js llena esta grilla; main.js aplica filtros y paginación -->
+            <div class="catalogo__grilla" id="grillaProductos"></div>
 
-            </div>
-
-            <!-- Paginación -->
+            <!-- main.js genera los botones de paginación acá -->
             <div class="catalogo__paginacion" id="paginacion"></div>
 
             <!-- Banner mayorista -->
@@ -163,6 +164,7 @@
         💬
     </a>
 
+    <!-- Scripts: api.js primero, luego auth, luego los que dependen de ambos -->
     <script src="../src/js/api.js"></script>
     <script src="../src/js/auth.js"></script>
     <script src="../src/js/carrito.js"></script>

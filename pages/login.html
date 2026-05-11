@@ -33,6 +33,7 @@
                     <li><a href="sobre-nosotros.html" class="encabezado__enlace-nav">Sobre Nosotros</a></li>
                     <li><a href="contacto.html" class="encabezado__enlace-nav">Contacto</a></li>
                 </ul>
+                <!-- auth.js lo llena según si hay sesión activa -->
                 <div class="encabezado__auth" id="navAuth"></div>
             </nav>
         </div>
@@ -48,9 +49,10 @@
                 <p class="auth-card__subtitulo">Accedé a tu cuenta de CUERAR TUCUMÁN</p>
             </div>
 
-            <!-- Mensaje de error -->
+            <!-- Div de error: se muestra si falla el login -->
             <div class="auth-card__error" id="authError" style="display:none;"></div>
 
+            <!-- novalidate para manejar la validación manualmente en JS -->
             <form class="auth-card__formulario" id="formLogin" novalidate>
 
                 <div class="campo">
@@ -106,7 +108,7 @@
     <script src="../src/js/api.js"></script>
     <script src="../src/js/auth.js"></script>
     <script>
-        // Redirigir si ya está logueado
+        // Si ya tiene sesión activa no tiene sentido estar en el login
         if (estaLogueado()) {
             window.location.href = "../index.html";
         }
@@ -154,7 +156,7 @@
 
                 guardarSesion(datos.access_token, datos.usuario);
 
-                // Redirigir según el rol
+                // Todos van al inicio por ahora; se puede cambiar si se necesita redirigir al admin directo
                 if (datos.usuario.es_admin) {
                     window.location.href = "../index.html";
                 } else {
