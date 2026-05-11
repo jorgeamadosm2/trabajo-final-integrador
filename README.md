@@ -240,6 +240,21 @@ Los visitantes pueden agregar productos al carrito desde el catálogo. El carrit
 
 ---
 
+## Catálogo de productos
+
+El catálogo en `/pages/productos.html` incluye:
+
+- Filtrado por categoría
+- **Paginación por filas**: el usuario elige cuántos productos ver por página (6, 12 o todos), con controles de navegación entre páginas
+
+---
+
+## Notificaciones toast
+
+Todas las acciones del usuario (login, logout, registro, agregar al carrito, envío de formularios, errores de validación, etc.) muestran notificaciones toast no intrusivas en la esquina inferior derecha de la pantalla. Las notificaciones se clasifican por tipo: éxito, error, advertencia e información, y se cierran automáticamente.
+
+---
+
 ## Recuperación de contraseña
 
 Flujo completo por email:
