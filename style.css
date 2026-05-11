@@ -1,4 +1,4 @@
-/* ---- Propiedades Personalizadas CSS ---- */
+/* Variables */
 :root {
     --color-primario: #7A3B1E;
     --color-primario-oscuro: #4E2410;
@@ -37,7 +37,7 @@
     --transicion-lenta: 0.4s ease;
 }
 
-/* ---- Reset y Base ---- */
+/* Reset */
 *,
 *::before,
 *::after {
@@ -793,7 +793,7 @@ ul {
     gap: 16px;
 }
 
-/* ---- Paginación ---- */
+/* Paginación del catálogo */
 .catalogo__paginacion {
     display: flex;
     justify-content: center;
@@ -3219,10 +3219,10 @@ ul {
     transform: translateX(-50%) translateY(0);
 }
 
-/* Notificación global (éxito / error) */
+/* Notificación tipo toast — aparece deslizando desde la derecha */
 .notif-toast {
     position: fixed;
-    top: 88px;
+    top: 88px; /* debajo del header fijo */
     right: 24px;
     z-index: 9999;
     min-width: 240px;
@@ -3233,7 +3233,7 @@ ul {
     font-weight: 500;
     color: #fff;
     box-shadow: 0 4px 20px rgba(0,0,0,0.22);
-    transform: translateX(calc(100% + 32px));
+    transform: translateX(calc(100% + 32px)); /* oculto fuera de pantalla */
     transition: transform 0.3s ease;
     pointer-events: none;
 }
@@ -3580,9 +3580,9 @@ ul {
     font-weight: 600;
 }
 
-/* ═══════════════════════════════════════
+/* ============================================
    DASHBOARD ADMINISTRATIVO
-═══════════════════════════════════════ */
+   ============================================ */
 
 .dash__actualizacion {
     font-size: 0.8rem;

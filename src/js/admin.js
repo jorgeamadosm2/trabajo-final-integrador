@@ -608,7 +608,7 @@ function renderizarDashboard() {
     const mesActual  = ahora.getMonth();
     const anioActual = ahora.getFullYear();
 
-    // ── KPIs ──────────────────────────────────────────────────────────────────
+    // KPIs generales del dashboard
     const ingresosTotal  = todosPedidos.reduce((s, p) => s + p.total, 0);
     const pedidosMes     = todosPedidos.filter(p => {
         const f = new Date(p.created_at);
@@ -622,7 +622,7 @@ function renderizarDashboard() {
     document.getElementById("dashPedidosMes").textContent     = pedidosMes.length;
     document.getElementById("dashTicketPromedio").textContent = "$" + Math.round(ticketPromedio).toLocaleString("es-AR");
 
-    // ── Gráfico: ingresos por mes (últimos 6 meses) ───────────────────────────
+    // Gráfico de barras: ingresos por mes (últimos 6)
     const labelesMeses = [];
     const datosIngresos = [];
     for (let i = 5; i >= 0; i--) {
@@ -662,7 +662,7 @@ function renderizarDashboard() {
         }
     });
 
-    // ── Gráfico: ventas por categoría ─────────────────────────────────────────
+    // Gráfico de dona: ingresos por categoría de producto
     const ingresosCat = { "materia-prima": 0, "elaborados": 0, "herramientas": 0 };
     todosPedidos.forEach(p => {
         p.items.forEach(item => {
@@ -692,7 +692,7 @@ function renderizarDashboard() {
         }
     });
 
-    // ── Top 5 productos más vendidos ──────────────────────────────────────────
+    // Top 5 productos por ingresos generados
     const conteo = {};
     todosPedidos.forEach(p => {
         p.items.forEach(item => {
@@ -720,7 +720,7 @@ function renderizarDashboard() {
             </div>`).join("")
         : `<p class="admin__vacio">Sin ventas registradas.</p>`;
 
-    // ── Gráfico: mensajes por asunto ──────────────────────────────────────────
+    // Gráfico de dona: distribución de mensajes por asunto
     const asuntos = { consulta: 0, mayorista: 0, pedido: 0, otro: 0 };
     todosMensajes.forEach(m => { if (asuntos[m.asunto] !== undefined) asuntos[m.asunto]++; });
 
@@ -743,7 +743,7 @@ function renderizarDashboard() {
         }
     });
 
-    // ── Pedidos recientes (últimos 5) ─────────────────────────────────────────
+    // Últimos 5 pedidos
     const recientes = [...todosPedidos]
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .slice(0, 5);
@@ -761,7 +761,7 @@ function renderizarDashboard() {
             </div>`).join("")
         : `<p class="admin__vacio">No hay pedidos registrados.</p>`;
 
-    // ── Stock crítico (stock === 0 o stock <= 5) ──────────────────────────────
+    // Productos con stock crítico (≤5 unidades o sin stock)
     const criticos = todosLosProductos
         .filter(p => p.activo && p.stock !== null && p.stock !== undefined && p.stock <= 5)
         .sort((a, b) => a.stock - b.stock)
@@ -786,11 +786,6 @@ function formatearFecha(isoString) {
 }
 
 
-/**
- * Genera y descarga un archivo CSV a partir de un array de filas.
- * La primera fila debe ser el array de encabezados.
- * Incluye BOM UTF-8 para compatibilidad con Excel (tildes y ñ).
- */
 function exportarCSV(filas, nombreArchivo) {
     const contenido = filas
         .map(fila => fila.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))

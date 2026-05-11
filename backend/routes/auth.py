@@ -155,6 +155,7 @@ def reset_password():
 @admin_required
 def listar_usuarios():
     user_id  = get_jwt_identity()
+    # id__ne excluye al propio admin logueado de la lista
     usuarios = Usuario.objects(id__ne=user_id).order_by("nombre")
     return jsonify({
         "ok":       True,
