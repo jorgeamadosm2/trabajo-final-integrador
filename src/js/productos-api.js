@@ -15,7 +15,7 @@ function renderizarCard(producto) {
 
   const precioFormateado = producto.precio.toLocaleString("es-AR");
   const unidad = producto.unidad ? ` /${producto.unidad}` : "";
-  const imagenSrc = producto.imagenUrl || "../src/img/materia-prima.png";
+  const imagenSrc = producto.imagen_url || "../src/img/materia-prima.png";
   const esRaiz = !window.location.pathname.includes('/pages/');
   const rutaContacto = esRaiz ? "pages/contacto.html" : "contacto.html";
 
