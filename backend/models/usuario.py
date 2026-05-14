@@ -2,6 +2,8 @@ from mongoengine import Document, StringField, BooleanField, DateTimeField, Emai
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+# ── Modelo: Usuario ───────────────────────────────────────────────────────────
+# Colección "usuarios" en MongoDB. Gestiona tanto clientes como administradores.
 class Usuario(Document):
     nombre   = StringField(required=True, max_length=100)
     email    = EmailField(required=True, unique=True)
@@ -10,12 +12,14 @@ class Usuario(Document):
     activo   = BooleanField(default=True)
     created_at = DateTimeField(default=datetime.utcnow)
 
-    # Token temporal para el flujo de recuperación de contraseña
+    # Campos para el flujo de recuperación de contraseña (token temporal de 1 hora)
     reset_token         = StringField(default=None)
     reset_token_expires = DateTimeField(default=None)
 
     meta = {"collection": "usuarios"}
 
+    # ── Métodos de contraseña ─────────────────────────────────────────────────
+    # Nunca se guarda la contraseña en texto plano, solo el hash de Werkzeug.
     def set_password(self, password_raw):
         self.password_hash = generate_password_hash(password_raw)
 

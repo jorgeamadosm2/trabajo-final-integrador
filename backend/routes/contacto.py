@@ -8,6 +8,7 @@ from utils.decorators import admin_required
 contacto_bp = Blueprint("contacto", __name__, url_prefix="/api/contacto")
 
 
+# ── Validación de payload ─────────────────────────────────────────────────────
 def _validar_mensaje(data):
     errores = []
     if not data.get("nombre", "").strip():
@@ -22,6 +23,8 @@ def _validar_mensaje(data):
     return errores
 
 
+# ── Enviar mensaje (público) ──────────────────────────────────────────────────
+# Cualquier visitante puede enviar un mensaje sin necesidad de estar logueado.
 @contacto_bp.post("")
 def enviar_mensaje():
     data = request.get_json()
@@ -46,6 +49,8 @@ def enviar_mensaje():
     }), 201
 
 
+# ── Listar mensajes (admin) ───────────────────────────────────────────────────
+# Acepta filtro opcional ?no_leidos=true para mostrar solo los no revisados.
 @contacto_bp.get("")
 @admin_required
 def listar_mensajes():
@@ -62,6 +67,7 @@ def listar_mensajes():
     }), 200
 
 
+# ── Marcar como leído (admin) ─────────────────────────────────────────────────
 @contacto_bp.patch("/<mensaje_id>/leido")
 @admin_required
 def marcar_leido(mensaje_id):
@@ -78,6 +84,7 @@ def marcar_leido(mensaje_id):
     return jsonify({"ok": True, "mensaje": mensaje.to_dict()}), 200
 
 
+# ── Eliminar mensaje (admin) ──────────────────────────────────────────────────
 @contacto_bp.delete("/<mensaje_id>")
 @admin_required
 def eliminar_mensaje(mensaje_id):

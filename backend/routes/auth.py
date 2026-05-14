@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
+# ── Registro ──────────────────────────────────────────────────────────────────
+# Crea un nuevo usuario. Si el campo "codigo_admin" coincide con ADMIN_SECRET_CODE,
+# el usuario queda registrado con rol admin.
 @auth_bp.post("/register")
 def register():
     data = request.get_json()
@@ -43,6 +46,9 @@ def register():
     }), 201
 
 
+# ── Login ─────────────────────────────────────────────────────────────────────
+# Valida credenciales y devuelve un JWT de 24 horas.
+# El mensaje de error es genérico para no revelar si el email existe.
 @auth_bp.post("/login")
 def login():
     data = request.get_json()
@@ -53,7 +59,6 @@ def login():
     password = data.get("password", "")
     usuario  = Usuario.objects(email=email).first()
 
-    # Mensaje genérico para no revelar si el email existe
     if not usuario or not usuario.check_password(password):
         return jsonify({"ok": False, "error": "Email o contraseña incorrectos"}), 401
 
@@ -68,6 +73,7 @@ def login():
     }), 200
 
 
+# ── Perfil del usuario autenticado ────────────────────────────────────────────
 @auth_bp.get("/me")
 @jwt_required()
 def me():
@@ -77,6 +83,9 @@ def me():
     return jsonify({"ok": True, "usuario": usuario.to_dict()}), 200
 
 
+# ── Recuperación de contraseña: solicitud ─────────────────────────────────────
+# Genera un token temporal de 1 hora y envía el link de reseteo por email.
+# La respuesta es siempre la misma para no revelar si el email está registrado.
 @auth_bp.post("/forgot-password")
 def forgot_password():
     data = request.get_json()
@@ -89,7 +98,6 @@ def forgot_password():
 
     usuario = Usuario.objects(email=email).first()
 
-    # Respuesta genérica para no revelar si el email está registrado
     if not usuario:
         return jsonify({"ok": True, "mensaje": "Si el email existe, recibirás las instrucciones."}), 200
 
@@ -123,6 +131,8 @@ def forgot_password():
     return jsonify({"ok": True, "mensaje": "Si el email existe, recibirás las instrucciones."}), 200
 
 
+# ── Recuperación de contraseña: confirmación ──────────────────────────────────
+# Valida el token y actualiza la contraseña. Invalida el token al finalizar.
 @auth_bp.post("/reset-password")
 def reset_password():
     data = request.get_json()
@@ -151,11 +161,13 @@ def reset_password():
     return jsonify({"ok": True, "mensaje": "Contraseña actualizada correctamente"}), 200
 
 
+# ── Gestión de usuarios (solo admin) ─────────────────────────────────────────
+
+# Lista todos los usuarios excepto el admin logueado (id__ne lo excluye).
 @auth_bp.get("/usuarios")
 @admin_required
 def listar_usuarios():
     user_id  = get_jwt_identity()
-    # id__ne excluye al propio admin logueado de la lista
     usuarios = Usuario.objects(id__ne=user_id).order_by("nombre")
     return jsonify({
         "ok":       True,
@@ -164,6 +176,7 @@ def listar_usuarios():
     }), 200
 
 
+# Edita nombre y rol de un usuario.
 @auth_bp.put("/usuarios/<usuario_id>")
 @admin_required
 def editar_usuario(usuario_id):
@@ -190,6 +203,7 @@ def editar_usuario(usuario_id):
     return jsonify({"ok": True, "usuario": usuario.to_dict()}), 200
 
 
+# Activa o desactiva la cuenta de un usuario (dar de baja / reactivar).
 @auth_bp.patch("/usuarios/<usuario_id>/estado")
 @admin_required
 def toggle_estado_usuario(usuario_id):

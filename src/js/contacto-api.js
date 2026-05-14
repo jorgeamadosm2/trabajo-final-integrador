@@ -1,3 +1,7 @@
+// ── Formulario de contacto ────────────────────────────────────────────────────
+// Intercepta el submit del formulario, envía los datos a POST /contacto y
+// reemplaza el formulario con un mensaje de confirmación si tiene éxito,
+// o muestra un error en pantalla si falla.
 document.addEventListener("DOMContentLoaded", () => {
   const formulario = document.getElementById("formularioContacto");
   if (!formulario) return;
@@ -12,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       mensaje: formulario.querySelector('[name="mensaje"]').value.trim(),
     };
 
+    // Deshabilitar el botón mientras se envía para evitar doble submit
     const botonEnviar    = formulario.querySelector('[type="submit"]');
     const textoOriginal  = botonEnviar.textContent;
     botonEnviar.disabled = true;
@@ -23,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(datos),
       });
 
+      // Reemplazar el formulario por pantalla de confirmación
       formulario.innerHTML = `
         <div style="
           text-align: center;
@@ -40,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
     } catch (error) {
+      // Mostrar el error encima del formulario sin perder los datos cargados
       let mensajeError = document.getElementById("error-formulario");
       if (!mensajeError) {
         mensajeError = document.createElement("div");

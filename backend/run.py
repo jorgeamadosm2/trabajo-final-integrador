@@ -1,6 +1,9 @@
 import os
 from app import create_app
 
+# ── Punto de entrada del servidor ─────────────────────────────────────────────
+# Ejecutar con: python run.py
+# El puerto lo puede sobreescribir la variable PORT (usado por Render en producción).
 app = create_app()
 
 if __name__ == "__main__":

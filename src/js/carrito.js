@@ -1,5 +1,8 @@
 const CARRITO_KEY = 'cuerar_carrito';
 
+// ── Persistencia en localStorage ─────────────────────────────────────────────
+// El carrito se guarda como JSON en localStorage para sobrevivir recargas de página.
+
 function obtenerCarrito() {
     return JSON.parse(localStorage.getItem(CARRITO_KEY) || '[]');
 }
@@ -10,6 +13,9 @@ function guardarCarrito(carrito) {
     renderizarDropdownCarrito();
 }
 
+// ── Operaciones sobre items ───────────────────────────────────────────────────
+
+// Si el producto ya está en el carrito, incrementa la cantidad en lugar de duplicarlo.
 function agregarAlCarrito(producto) {
     const carrito   = obtenerCarrito();
     const existente = carrito.find(item => item.id === producto.id);
@@ -29,6 +35,7 @@ function eliminarDelCarrito(id) {
     if (item) mostrarNotificacion(`"${item.nombre}" eliminado del carrito`);
 }
 
+// delta = +1 o -1. Si la cantidad llega a 0, elimina el item directamente.
 function cambiarCantidad(id, delta) {
     const carrito = obtenerCarrito();
     const item    = carrito.find(i => i.id === id);
@@ -45,6 +52,8 @@ function calcularTotal(carrito) {
     return carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 }
 
+// ── Badge del ícono ───────────────────────────────────────────────────────────
+// Actualiza el número visible sobre el ícono del carrito en el navbar.
 function actualizarBadge() {
     const carrito    = obtenerCarrito();
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
@@ -54,6 +63,9 @@ function actualizarBadge() {
     });
 }
 
+// ── Panel desplegable ─────────────────────────────────────────────────────────
+// Renderiza la lista de items y el footer con el total dentro del panel del carrito.
+// Si no hay sesión, reemplaza el botón "Comprar" por un link al login.
 function renderizarDropdownCarrito() {
     const panel = document.getElementById('carritoPanel');
     if (!panel) return;
@@ -121,6 +133,9 @@ function mostrarToast(mensaje) {
     mostrarNotificacion(mensaje);
 }
 
+// ── Inicialización del widget ─────────────────────────────────────────────────
+// Construye el botón del carrito y el panel desplegable, los inserta antes de
+// #navAuth en el navbar, y configura los eventos de apertura/cierre.
 function inicializarCarrito() {
     const authDiv = document.getElementById('navAuth');
     if (!authDiv) return;
@@ -178,7 +193,9 @@ function inicializarCarrito() {
     renderizarDropdownCarrito();
 }
 
-// Event delegation para botones de agregar al carrito (funciona con tarjetas dinámicas)
+// ── Event delegation para botones de agregar ──────────────────────────────────
+// Escucha clicks a nivel del document para capturar botones en tarjetas
+// generadas dinámicamente por productos-api.js (que aún no existen al cargar).
 document.addEventListener('click', e => {
     const btn = e.target.closest('.tarjeta-producto__boton-carrito');
     if (!btn) return;

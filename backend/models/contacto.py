@@ -3,6 +3,9 @@ from datetime import datetime
 
 ASUNTOS_VALIDOS = ["consulta", "mayorista", "pedido", "otro"]
 
+# ── Modelo: MensajeContacto ───────────────────────────────────────────────────
+# Colección "mensajes_contacto" en MongoDB, ordenada por fecha descendente.
+# El campo "leido" permite al admin distinguir mensajes nuevos de los ya revisados.
 class MensajeContacto(Document):
     nombre   = StringField(required=True, max_length=150)
     email    = EmailField(required=True)

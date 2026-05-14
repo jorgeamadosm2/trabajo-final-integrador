@@ -3,8 +3,10 @@ from mongoengine import (Document, EmbeddedDocument, StringField, FloatField,
 from datetime import datetime
 
 
+# ── Modelo: ItemPedido (embebido) ─────────────────────────────────────────────
+# Representa un producto dentro de un pedido. Guarda un snapshot del nombre y
+# precio al momento de la compra, para que cambios futuros no alteren el historial.
 class ItemPedido(EmbeddedDocument):
-    # Snapshot del producto al momento del pedido (nombre y precio fijos)
     producto_id = StringField()
     nombre      = StringField(required=True)
     precio      = FloatField(required=True)
@@ -22,12 +24,15 @@ class ItemPedido(EmbeddedDocument):
         }
 
 
+# ── Modelo: Pedido ────────────────────────────────────────────────────────────
+# Colección "pedidos" en MongoDB, ordenada por fecha descendente.
+# Los datos del usuario también son snapshot para preservar el historial si
+# la cuenta cambia o se elimina.
 class Pedido(Document):
     numero         = StringField(required=True, unique=True)
     usuario_id     = StringField()
-    # Snapshot del usuario al momento del pedido
-    usuario_nombre = StringField()
-    usuario_email  = StringField()
+    usuario_nombre = StringField()   # snapshot del nombre al momento del pedido
+    usuario_email  = StringField()   # snapshot del email al momento del pedido
     items          = ListField(EmbeddedDocumentField(ItemPedido))
     total          = FloatField(required=True)
     estado         = StringField(default="pendiente", choices=["pendiente", "procesado"])

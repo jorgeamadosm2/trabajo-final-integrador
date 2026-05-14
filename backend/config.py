@@ -4,16 +4,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    # ── Base de datos ─────────────────────────────────────────────────────────
     MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/cuerar_db")
 
+    # ── Autenticación JWT ─────────────────────────────────────────────────────
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-secret-key-cambiar-en-produccion")
-    JWT_ACCESS_TOKEN_EXPIRES = 86400  # 24 horas
+    JWT_ACCESS_TOKEN_EXPIRES = 86400  # 24 horas en segundos
 
     DEBUG = os.environ.get("FLASK_ENV") == "development"
 
     # Código que el usuario debe ingresar en el registro para obtener rol admin
     ADMIN_SECRET_CODE = os.environ.get("ADMIN_SECRET_CODE", "cuerar-admin-2024")
 
+    # ── Email ─────────────────────────────────────────────────────────────────
     # URL base del frontend para armar el link de reset de contraseña
     FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://trabajo-final-integrador-coral.vercel.app")
 
