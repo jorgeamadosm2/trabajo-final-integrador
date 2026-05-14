@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Menú hamburguesa
+    // ── Menú hamburguesa ──────────────────────────────────────────────────────
+    // Abre/cierra el menú en mobile. Se cierra también al hacer clic en un enlace
+    // o fuera del menú.
     const botonMenu = document.getElementById('botonMenu');
     const menuNav   = document.getElementById('menuNav');
 
@@ -25,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sombra en el header al hacer scroll
+    // ── Sombra del header al hacer scroll ────────────────────────────────────
+    // Oscurece el fondo del encabezado cuando el usuario baja más de 80px.
     const encabezado = document.getElementById('encabezado');
     if (encabezado) {
         window.addEventListener('scroll', () => {
@@ -39,7 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Animación de aparición al hacer scroll (Intersection Observer)
+    // ── Animación de aparición al hacer scroll ────────────────────────────────
+    // Usa IntersectionObserver para animar con fade + slide-up los elementos
+    // cuando entran en el viewport. El delay escalonado crea un efecto cascada.
     const elementosRevelar = document.querySelectorAll(
         '.tarjeta-beneficio, .tarjeta-categoria, .tarjeta-producto, .tarjeta-testimonio, .vista-nosotros__grilla, .encabezado-seccion'
     );
@@ -49,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity   = '1';
                 entry.target.style.transform = 'translateY(0)';
-                observadorRevelar.unobserve(entry.target);
+                observadorRevelar.unobserve(entry.target); // animación solo una vez
             }
         });
     }, {
@@ -64,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         observadorRevelar.observe(el);
     });
 
-    // Scroll suave para enlaces ancla
+    // ── Scroll suave para enlaces ancla ──────────────────────────────────────
     document.querySelectorAll('a[href^="#"]').forEach(ancla => {
         ancla.addEventListener('click', function (e) {
             e.preventDefault();
@@ -75,8 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Filtros y paginación del catálogo
-    // Se inicializa cuando productos-api.js termina de insertar las cards ("productosListos")
+    // ── Filtros y paginación del catálogo ────────────────────────────────────
+    // Se inicializa cuando productos-api.js termina de insertar las cards ("productosListos").
+    // Calcula cuántos productos mostrar por página según las columnas reales del grid CSS.
     function inicializarFiltros() {
         const filtros           = document.querySelectorAll('.catalogo__filtro');
         const todasLasTarjetas  = Array.from(document.querySelectorAll('.catalogo__grilla .tarjeta-producto'));
@@ -88,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let tarjetasFiltradas = todasLasTarjetas;
         let paginaActual      = 1;
 
+        // Lee el número real de columnas del grid para calcular items por página de forma responsiva
         function calcularPorPagina() {
             const grilla = document.getElementById('grillaProductos');
             if (!grilla) return 8;
@@ -95,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return columnas * 2;
         }
 
+        // Muestra solo los productos de la página actual y oculta el resto
         function actualizarVista() {
             const porPagina    = calcularPorPagina();
             const total        = tarjetasFiltradas.length;
@@ -120,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderizarPaginacion(totalPaginas);
         }
 
+        // Genera los botones de paginación dinámicamente
         function renderizarPaginacion(totalPaginas) {
             if (!contenedorPag) return;
             if (totalPaginas <= 1) { contenedorPag.innerHTML = ''; return; }
@@ -151,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // Filtra las tarjetas por categoría y vuelve a la página 1
         function aplicarFiltro(categoria) {
             tarjetasFiltradas = categoria === 'todos'
                 ? todasLasTarjetas
@@ -167,9 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Recalcular al redimensionar porque cambian las columnas del grid
         window.addEventListener('resize', actualizarVista);
         aplicarFiltro('todos');
     }
 
+    // Espera a que productos-api.js haya insertado las tarjetas en el DOM
     document.addEventListener('productosListos', inicializarFiltros);
 });

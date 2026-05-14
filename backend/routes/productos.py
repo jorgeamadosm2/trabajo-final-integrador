@@ -9,6 +9,8 @@ from utils.decorators import admin_required
 productos_bp = Blueprint("productos", __name__, url_prefix="/api/productos")
 
 
+# ── Validación de payload ─────────────────────────────────────────────────────
+# Centraliza las reglas de validación para crear y editar productos.
 def _validar_producto(data):
     errores = []
     if not data.get("nombre", "").strip():
@@ -27,12 +29,14 @@ def _validar_producto(data):
     return errores
 
 
+# ── Listar productos ──────────────────────────────────────────────────────────
+# Público por defecto (solo activos). Con ?todos=true y token de admin devuelve
+# también los inactivos. Acepta filtros opcionales: ?categoria= y ?destacado=true.
 @productos_bp.get("")
 def listar_productos():
     from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
     from models import Usuario
 
-    # ?todos=true devuelve productos inactivos; solo lo respetamos si el token es de admin
     mostrar_todos = request.args.get("todos", "").lower() == "true"
     if mostrar_todos:
         try:
@@ -63,6 +67,8 @@ def listar_productos():
     }), 200
 
 
+# ── Productos destacados (home) ───────────────────────────────────────────────
+# Devuelve hasta 3 productos activos marcados como destacados.
 @productos_bp.get("/destacados")
 def productos_destacados():
     productos = Producto.objects(activo=True, destacado=True).limit(3)
@@ -72,6 +78,7 @@ def productos_destacados():
     }), 200
 
 
+# ── Detalle de un producto ────────────────────────────────────────────────────
 @productos_bp.get("/<producto_id>")
 def obtener_producto(producto_id):
     try:
@@ -85,6 +92,7 @@ def obtener_producto(producto_id):
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
+# ── Crear producto (admin) ────────────────────────────────────────────────────
 @productos_bp.post("")
 @admin_required
 def crear_producto():
@@ -118,6 +126,7 @@ def crear_producto():
     return jsonify({"ok": True, "producto": producto.to_dict()}), 201
 
 
+# ── Editar producto (admin) ───────────────────────────────────────────────────
 @productos_bp.put("/<producto_id>")
 @admin_required
 def editar_producto(producto_id):
@@ -155,6 +164,9 @@ def editar_producto(producto_id):
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
+# ── Eliminar producto (admin) — soft-delete ───────────────────────────────────
+# No borra el documento: pone activo=False para ocultar del catálogo público
+# y preservar el historial en pedidos existentes.
 @productos_bp.delete("/<producto_id>")
 @admin_required
 def eliminar_producto(producto_id):
@@ -166,7 +178,6 @@ def eliminar_producto(producto_id):
     if not producto:
         return jsonify({"ok": False, "error": "Producto no encontrado"}), 404
 
-    # Soft-delete: no se borra el documento, se oculta del catálogo
     producto.activo     = False
     producto.updated_at = datetime.utcnow()
     producto.save()

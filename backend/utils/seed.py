@@ -1,6 +1,7 @@
 """
-Poblar MongoDB con los 12 productos del catálogo.
+Script de carga inicial de productos en MongoDB.
 Uso: python utils/seed.py  (desde la carpeta backend/)
+Pregunta si borrar los existentes antes de insertar, para evitar duplicados.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -8,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import create_app
 from models import Producto
 
+# ── Datos de los 12 productos del catálogo ────────────────────────────────────
 PRODUCTOS = [
     # Materia prima
     {
@@ -86,6 +88,7 @@ PRODUCTOS = [
     },
 ]
 
+# ── Función principal ─────────────────────────────────────────────────────────
 def seed():
     app = create_app()
     with app.app_context():

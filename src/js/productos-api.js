@@ -1,3 +1,6 @@
+// ── Renderizado de tarjetas ───────────────────────────────────────────────────
+// Genera el HTML de una tarjeta de producto. Maneja etiquetas, estado sin stock
+// y adapta la ruta de la imagen según desde qué página se renderiza.
 function renderizarCard(producto) {
   const claseEtiqueta = producto.etiqueta === "Popular"
     ? "tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular"
@@ -11,9 +14,9 @@ function renderizarCard(producto) {
   const sinStock = producto.stock !== null && producto.stock !== undefined && producto.stock === 0;
 
   const precioFormateado = producto.precio.toLocaleString("es-AR");
-  const unidad     = producto.unidad ? ` /${producto.unidad}` : "";
-  const imagenSrc  = producto.imagen_url || "../src/img/materia-prima.png";
-  const esRaiz     = !window.location.pathname.includes('/pages/');
+  const unidad = producto.unidad ? ` /${producto.unidad}` : "";
+  const imagenSrc = producto.imagenUrl || "../src/img/materia-prima.png";
+  const esRaiz = !window.location.pathname.includes('/pages/');
   const rutaContacto = esRaiz ? "pages/contacto.html" : "contacto.html";
 
   return `
@@ -35,15 +38,15 @@ function renderizarCard(producto) {
           <span class="tarjeta-producto__precio">$${precioFormateado}${unidad}</span>
           <div class="tarjeta-producto__acciones">
             ${sinStock
-              ? `<button class="tarjeta-producto__boton-carrito" disabled>Sin stock</button>`
-              : `<button
+      ? `<button class="tarjeta-producto__boton-carrito" disabled>Sin stock</button>`
+      : `<button
                   class="tarjeta-producto__boton-carrito"
                   data-id="${producto.id}"
                   data-nombre="${producto.nombre}"
                   data-precio="${producto.precio}"
                   data-unidad="${producto.unidad || ''}"
                 >🛒 Agregar</button>`
-            }
+    }
             <a href="${rutaContacto}" class="tarjeta-producto__boton">Consultar</a>
           </div>
         </div>
@@ -52,12 +55,16 @@ function renderizarCard(producto) {
   `;
 }
 
+// ── Carga del catálogo completo ───────────────────────────────────────────────
+// Llama a GET /productos, renderiza todas las cards en #grillaProductos y
+// dispara el evento "productosListos" para que main.js active filtros y paginación.
+// También actualiza los contadores de cantidad por categoría en los botones de filtro.
 async function cargarCatalogo() {
   const grilla = document.getElementById("grillaProductos");
   if (!grilla) return;
 
   try {
-    const datos    = await apiFetch("/productos");
+    const datos = await apiFetch("/productos");
     const productos = datos.productos;
 
     grilla.innerHTML = productos.map(renderizarCard).join("");
@@ -71,7 +78,7 @@ async function cargarCatalogo() {
     });
 
     document.querySelectorAll("[data-filtro]").forEach((btn) => {
-      const cat  = btn.dataset.filtro;
+      const cat = btn.dataset.filtro;
       const span = btn.querySelector(".catalogo__filtro-count");
       if (span && contadores[cat] !== undefined) {
         span.textContent = contadores[cat];
@@ -88,14 +95,15 @@ async function cargarCatalogo() {
   }
 }
 
+// ── Carga de productos destacados (home) ──────────────────────────────────────
+// Llama a GET /productos/destacados y renderiza hasta 3 cards en .destacados__grilla.
+// Limpia los paths "../src/img/" del seed para que funcionen desde la raíz del sitio.
 async function cargarDestacados() {
   const grilla = document.querySelector(".destacados__grilla");
   if (!grilla) return;
 
   try {
     const datos = await apiFetch("/productos/destacados");
-
-    // index.html está en la raíz, las imágenes vienen con "../src/img/" del seed — hay que limpiarlas
 
     const productosAdaptados = datos.productos.map((p) => ({
       ...p,

@@ -1,6 +1,9 @@
 // URL base del backend. En desarrollo cambiar a: http://127.0.0.1:5000/api
 const API_BASE = "https://trabajo-final-integrador-58s4.onrender.com/api";
 
+// ── Notificaciones toast ─────────────────────────────────────────────────────
+// Muestra un mensaje flotante en pantalla (éxito o error) durante 3.2 segundos.
+// Reutiliza el mismo elemento si ya existe para evitar duplicados.
 function mostrarNotificacion(mensaje, tipo = 'exito') {
   let toast = document.getElementById('notifToast');
   if (!toast) {
@@ -10,12 +13,15 @@ function mostrarNotificacion(mensaje, tipo = 'exito') {
   }
   toast.className = `notif-toast notif-toast--${tipo}`;
   toast.textContent = (tipo === 'exito' ? '✓ ' : '✕ ') + mensaje;
-  void toast.offsetWidth; // forzar reflow para reiniciar la animación
+  void toast.offsetWidth; // forzar reflow para reiniciar la animación CSS
   toast.classList.add('notif-toast--visible');
   clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => toast.classList.remove('notif-toast--visible'), 3200);
 }
 
+// ── Cliente HTTP central ─────────────────────────────────────────────────────
+// Wrapper sobre fetch que agrega el token JWT automáticamente y maneja errores
+// globales (401 = sesión expirada → limpiar y redirigir al login).
 async function apiFetch(path, opciones = {}) {
   const token = localStorage.getItem("admin_token");
 

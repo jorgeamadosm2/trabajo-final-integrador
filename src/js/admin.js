@@ -1,28 +1,31 @@
-let todosLosProductos = [];  // cache de productos cargados
+// ── Estado global ─────────────────────────────────────────────────────────────
+// Cache de datos cargados desde la API. Se usan en filtros, exportaciones y dashboard.
+let todosLosProductos = [];
 let filtroCategoriaActual = "";
-let modoEdicion = false;     // false = agregar, true = editar
-let todosUsuarios = [];      // cache de usuarios cargados
-let todosPedidos  = [];      // cache de pedidos (MongoDB via API)
+let modoEdicion = false;     // false = formulario en modo "agregar", true = "editar"
+let todosUsuarios = [];
+let todosPedidos  = [];
 
 
+// ── Inicialización ────────────────────────────────────────────────────────────
+// Verifica que el usuario sea admin antes de mostrar nada.
+// Carga las cuatro secciones en paralelo para minimizar el tiempo de espera.
 document.addEventListener("DOMContentLoaded", async () => {
-    // Verificar que el usuario sea admin
     if (!estaLogueado() || !esAdmin()) {
         window.location.href = "../pages/login.html";
         return;
     }
 
-    // Cargar datos en paralelo
     await Promise.all([cargarProductos(), cargarMensajes(), cargarUsuarios(), cargarPedidos()]);
 
-    // Listener del formulario de producto
     document.getElementById("formProducto").addEventListener("submit", guardarProducto);
-
-    // Listener del formulario de edición de usuario
     document.getElementById("formUsuario").addEventListener("submit", guardarUsuario);
 });
 
 
+// ── Navegación de tabs ────────────────────────────────────────────────────────
+// Muestra la sección correspondiente y oculta las demás.
+// El dashboard tiene sus propios KPIs, por eso se oculta el banner de stats general.
 function mostrarTab(tab) {
     const secciones = {
         dashboard: "seccionDashboard",
@@ -46,22 +49,21 @@ function mostrarTab(tab) {
         document.getElementById(id).classList.toggle("admin__tab--activo", key === tab);
     });
 
-    // El dashboard tiene sus propios KPIs: ocultar el banner de stats
     document.getElementById("adminStats").style.display = tab === "dashboard" ? "none" : "";
 
-    // Mostrar solo las stats correspondientes a la tab activa
     document.querySelectorAll("#adminStats .admin__stat[data-tab]").forEach(el => {
         el.style.display = el.dataset.tab === tab ? "" : "none";
     });
 
-    // Renderizar el dashboard al entrar en esa tab
     if (tab === "dashboard") renderizarDashboard();
 }
 
 
+// ── Sección: Productos ────────────────────────────────────────────────────────
+
+// Carga todos los productos (incluye inactivos con ?todos=true) y actualiza la tabla y stats.
 async function cargarProductos() {
     try {
-        // ?todos=true incluye productos inactivos (admin JWT)
         const datos = await apiFetch("/productos?todos=true");
         todosLosProductos = datos.productos;
         renderizarTablaProductos(todosLosProductos);
@@ -79,6 +81,7 @@ function actualizarStats(productos) {
     document.getElementById("statInactivos").textContent = inactivos;
 }
 
+// Genera las filas de la tabla de productos con badges de categoría, stock y estado.
 function renderizarTablaProductos(productos) {
     const contenedor = document.getElementById("listaProductos");
 
@@ -129,8 +132,8 @@ function labelCategoria(cat) {
     return labels[cat] || cat;
 }
 
+// Filtra la tabla de productos por categoría sin volver a consultar la API.
 function filtrarAdmin(btn, categoria) {
-    // Resaltar botón activo
     document.querySelectorAll(".admin__filtros .admin__filtro").forEach(b => b.classList.remove("admin__filtro--activo"));
     btn.classList.add("admin__filtro--activo");
 
@@ -141,7 +144,7 @@ function filtrarAdmin(btn, categoria) {
     renderizarTablaProductos(filtrados);
 }
 
-
+// Alterna visibilidad del formulario de producto (agregar / cancelar).
 function toggleFormulario() {
     const form = document.getElementById("formularioProducto");
     const visible = form.style.display !== "none";
@@ -166,6 +169,7 @@ function cancelarFormulario() {
     modoEdicion = false;
 }
 
+// Precarga el formulario con los datos del producto seleccionado para editar.
 function abrirEditar(producto) {
     modoEdicion = true;
     document.getElementById("formTitulo").textContent = "Editar Producto";
@@ -188,6 +192,7 @@ function abrirEditar(producto) {
     form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+// Crea o edita un producto según modoEdicion. Recarga la tabla al finalizar.
 async function guardarProducto(e) {
     e.preventDefault();
     const errorDiv = document.getElementById("formError");
@@ -233,16 +238,15 @@ async function guardarProducto(e) {
     }
 }
 
+// Soft-delete (DELETE) o restauración (PUT con activo:true) según el estado actual.
 async function toggleActivo(id, estadoActual) {
     const accion = estadoActual ? "desactivar" : "restaurar";
     if (!confirm(`¿Seguro que querés ${accion} este producto?`)) return;
 
     try {
         if (estadoActual) {
-            // Soft-delete
             await apiFetch(`/productos/${id}`, { method: "DELETE" });
         } else {
-            // Reactivar via PUT
             const producto = todosLosProductos.find(p => p.id === id);
             await apiFetch(`/productos/${id}`, {
                 method: "PUT",
@@ -257,15 +261,17 @@ async function toggleActivo(id, estadoActual) {
 }
 
 
+// ── Sección: Mensajes de contacto ─────────────────────────────────────────────
+
 let todosMensajes = [];
 
+// Carga todos los mensajes y actualiza el badge con la cantidad de no leídos.
 async function cargarMensajes() {
     try {
         const datos = await apiFetch("/contacto");
         todosMensajes = datos.mensajes;
         const noLeidos = todosMensajes.filter(m => !m.leido).length;
 
-        // Actualizar badge del tab y stats
         document.getElementById("statMensajes").textContent = noLeidos;
         document.getElementById("statTotalMensajes").textContent = todosMensajes.length;
         if (noLeidos > 0) {
@@ -281,6 +287,7 @@ async function cargarMensajes() {
     }
 }
 
+// Filtra entre "todos" y "no leídos" usando el cache local (sin refetch).
 function filtrarMensajes(btn, filtro) {
     document.querySelectorAll(".admin__filtros-mensajes .admin__filtro").forEach(b => b.classList.remove("admin__filtro--activo"));
     btn.classList.add("admin__filtro--activo");
@@ -331,14 +338,15 @@ function renderizarMensajes(mensajes) {
     `).join("");
 }
 
+// Marca el mensaje como leído actualizando el cache local y el DOM directamente,
+// sin recargar toda la lista para evitar parpadeos.
 async function marcarLeido(id, btn) {
     try {
         await apiFetch(`/contacto/${id}/leido`, { method: "PATCH" });
-        // Actualizar el mensaje en el cache local sin recargar todo
+
         const idx = todosMensajes.findIndex(m => m.id === id);
         if (idx !== -1) todosMensajes[idx].leido = true;
 
-        // Actualizar la UI del mensaje
         const tarjeta = btn.closest(".admin__mensaje");
         tarjeta.classList.remove("admin__mensaje--nuevo");
         btn.replaceWith(Object.assign(document.createElement("span"), {
@@ -347,7 +355,6 @@ async function marcarLeido(id, btn) {
         }));
         tarjeta.querySelector(".admin__badge--nuevo")?.remove();
 
-        // Actualizar contador
         const noLeidos = todosMensajes.filter(m => !m.leido).length;
         document.getElementById("statMensajes").textContent = noLeidos;
         const badge = document.getElementById("badgeMensajes");
@@ -362,15 +369,15 @@ async function marcarLeido(id, btn) {
     }
 }
 
+// Elimina el mensaje del DOM y del cache local sin recargar la lista.
 async function eliminarMensaje(id) {
     if (!confirm("¿Seguro que querés eliminar este mensaje? Esta acción no se puede deshacer.")) return;
     try {
         await apiFetch(`/contacto/${id}`, { method: "DELETE" });
-        // Quitar del cache y del DOM
+
         todosMensajes = todosMensajes.filter(m => m.id !== id);
         document.getElementById(`msg-${id}`)?.remove();
 
-        // Actualizar contadores
         const noLeidos = todosMensajes.filter(m => !m.leido).length;
         document.getElementById("statMensajes").textContent = noLeidos;
         document.getElementById("statTotalMensajes").textContent = todosMensajes.length;
@@ -389,6 +396,9 @@ async function eliminarMensaje(id) {
 }
 
 
+// ── Sección: Usuarios ─────────────────────────────────────────────────────────
+
+// Carga todos los usuarios (excluye al admin logueado, lo hace el backend).
 async function cargarUsuarios() {
     try {
         const datos = await apiFetch("/auth/usuarios");
@@ -437,6 +447,7 @@ function renderizarUsuarios(usuarios) {
     contenedor.innerHTML = `<div class="admin__tabla">${filas}</div>`;
 }
 
+// Precarga el formulario de usuario con sus datos para editar.
 function abrirEditarUsuario(usuario) {
     document.getElementById("usuarioEditId").value = usuario.id;
     document.getElementById("uNombre").value        = usuario.nombre;
@@ -453,6 +464,7 @@ function cancelarFormUsuario() {
     document.getElementById("formUsuario").reset();
 }
 
+// Envía los cambios de nombre y rol del usuario al backend.
 async function guardarUsuario(e) {
     e.preventDefault();
     const errorDiv  = document.getElementById("formUsuarioError");
@@ -482,6 +494,7 @@ async function guardarUsuario(e) {
     }
 }
 
+// Activa o desactiva la cuenta de un usuario (dar de baja / reactivar).
 async function toggleEstadoUsuario(id, estadoActual) {
     const accion = estadoActual ? "dar de baja" : "reactivar";
     if (!confirm(`¿Seguro que querés ${accion} a este usuario?`)) return;
@@ -499,6 +512,9 @@ async function toggleEstadoUsuario(id, estadoActual) {
 }
 
 
+// ── Sección: Pedidos ──────────────────────────────────────────────────────────
+
+// Carga todos los pedidos y muestra un badge con los pendientes.
 async function cargarPedidos() {
     try {
         const datos = await apiFetch("/pedidos");
@@ -522,6 +538,7 @@ async function cargarPedidos() {
     }
 }
 
+// Filtra la lista de pedidos por estado usando el cache local.
 function filtrarPedidos(btn, filtro) {
     document.querySelectorAll("#seccionPedidos .admin__filtro").forEach(b => b.classList.remove("admin__filtro--activo"));
     btn.classList.add("admin__filtro--activo");
@@ -578,6 +595,7 @@ function renderizarPedidos(pedidos) {
     }).join("");
 }
 
+// Cambia el estado del pedido entre "pendiente" y "procesado".
 async function toggleEstadoPedido(id, nuevoEstado) {
     try {
         await apiFetch(`/pedidos/${id}/estado`, {
@@ -591,6 +609,7 @@ async function toggleEstadoPedido(id, nuevoEstado) {
     }
 }
 
+// Elimina el pedido permanentemente (no hay soft-delete para pedidos).
 async function eliminarPedido(id, numero) {
     if (!confirm(`¿Seguro que querés eliminar el pedido ${numero}? Esta acción no se puede deshacer.`)) return;
     try {
@@ -603,12 +622,15 @@ async function eliminarPedido(id, numero) {
 }
 
 
+// ── Sección: Dashboard ────────────────────────────────────────────────────────
+// Calcula KPIs y renderiza los gráficos Chart.js a partir del cache local.
+// Se destruyen los gráficos anteriores antes de crear nuevos para evitar duplicados.
 function renderizarDashboard() {
     const ahora      = new Date();
     const mesActual  = ahora.getMonth();
     const anioActual = ahora.getFullYear();
 
-    // KPIs generales del dashboard
+    // KPIs: ingresos totales, del mes actual, pedidos del mes y ticket promedio
     const ingresosTotal  = todosPedidos.reduce((s, p) => s + p.total, 0);
     const pedidosMes     = todosPedidos.filter(p => {
         const f = new Date(p.created_at);
@@ -622,7 +644,7 @@ function renderizarDashboard() {
     document.getElementById("dashPedidosMes").textContent     = pedidosMes.length;
     document.getElementById("dashTicketPromedio").textContent = "$" + Math.round(ticketPromedio).toLocaleString("es-AR");
 
-    // Gráfico de barras: ingresos por mes (últimos 6)
+    // Gráfico de barras: ingresos agrupados por mes (últimos 6 meses)
     const labelesMeses = [];
     const datosIngresos = [];
     for (let i = 5; i >= 0; i--) {
@@ -662,7 +684,7 @@ function renderizarDashboard() {
         }
     });
 
-    // Gráfico de dona: ingresos por categoría de producto
+    // Gráfico de dona: ingresos totales por categoría de producto
     const ingresosCat = { "materia-prima": 0, "elaborados": 0, "herramientas": 0 };
     todosPedidos.forEach(p => {
         p.items.forEach(item => {
@@ -720,7 +742,7 @@ function renderizarDashboard() {
             </div>`).join("")
         : `<p class="admin__vacio">Sin ventas registradas.</p>`;
 
-    // Gráfico de dona: distribución de mensajes por asunto
+    // Gráfico de dona: distribución de mensajes de contacto por asunto
     const asuntos = { consulta: 0, mayorista: 0, pedido: 0, otro: 0 };
     todosMensajes.forEach(m => { if (asuntos[m.asunto] !== undefined) asuntos[m.asunto]++; });
 
@@ -743,7 +765,7 @@ function renderizarDashboard() {
         }
     });
 
-    // Últimos 5 pedidos
+    // Últimos 5 pedidos ordenados por fecha descendente
     const recientes = [...todosPedidos]
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .slice(0, 5);
@@ -761,7 +783,7 @@ function renderizarDashboard() {
             </div>`).join("")
         : `<p class="admin__vacio">No hay pedidos registrados.</p>`;
 
-    // Productos con stock crítico (≤5 unidades o sin stock)
+    // Productos activos con stock crítico (≤5 unidades o sin stock)
     const criticos = todosLosProductos
         .filter(p => p.activo && p.stock !== null && p.stock !== undefined && p.stock <= 5)
         .sort((a, b) => a.stock - b.stock)
@@ -779,18 +801,21 @@ function renderizarDashboard() {
 }
 
 
+// ── Utilidades ────────────────────────────────────────────────────────────────
+
+// Formatea una fecha ISO a "dd/mm/yyyy hh:mm" en locale argentino.
 function formatearFecha(isoString) {
     const fecha = new Date(isoString);
     return fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
         + " " + fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 }
 
-
+// Genera y descarga un archivo CSV con BOM UTF-8 (para compatibilidad con Excel).
 function exportarCSV(filas, nombreArchivo) {
     const contenido = filas
         .map(fila => fila.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))
         .join("\n");
-    const blob = new Blob(["\uFEFF" + contenido], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["﻿" + contenido], { type: "text/csv;charset=utf-8;" });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement("a"), { href: url, download: nombreArchivo });
     a.click();

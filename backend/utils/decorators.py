@@ -3,6 +3,10 @@ from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Usuario
 
+# ── Decorador: admin_required ─────────────────────────────────────────────────
+# Protege rutas que solo pueden usar administradores.
+# Combina @jwt_required() (token válido) + verificación de es_admin en la BD.
+# Retorna 403 si el token es válido pero el usuario no es admin.
 def admin_required(fn):
     @wraps(fn)
     @jwt_required()

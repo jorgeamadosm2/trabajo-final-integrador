@@ -11,6 +11,9 @@ from utils.decorators import admin_required
 pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/api/pedidos")
 
 
+# ── Crear pedido ──────────────────────────────────────────────────────────────
+# Solo usuarios autenticados y activos pueden crear pedidos.
+# Flujo: verificar stock → guardar pedido → descontar stock.
 @pedidos_bp.post("")
 @jwt_required()
 def crear_pedido():
@@ -37,7 +40,7 @@ def crear_pedido():
     if Pedido.objects(numero=numero).first():
         return jsonify({"ok": False, "error": "Ya existe un pedido con ese número"}), 409
 
-    # Verificar stock antes de crear el pedido
+    # Verificar stock de todos los items antes de confirmar el pedido
     for item in items_raw:
         producto_id = item.get("id", "")
         if not producto_id:
@@ -67,6 +70,7 @@ def crear_pedido():
             unidad      = str(item.get("unidad", "") or ""),
         ))
 
+    # Guardar snapshot del usuario para preservar el historial aunque cambie su cuenta
     pedido = Pedido(
         numero         = numero,
         usuario_id     = str(usuario.id),
@@ -77,7 +81,7 @@ def crear_pedido():
     )
     pedido.save()
 
-    # Descontar stock tras confirmar el pedido
+    # Descontar stock tras confirmar el pedido (nunca llegar a negativo)
     for item in items_raw:
         producto_id = item.get("id", "")
         if not producto_id:
@@ -94,6 +98,8 @@ def crear_pedido():
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 201
 
 
+# ── Listar pedidos (admin) ────────────────────────────────────────────────────
+# Acepta filtro opcional ?estado=pendiente|procesado.
 @pedidos_bp.get("")
 @admin_required
 def listar_pedidos():
@@ -110,6 +116,7 @@ def listar_pedidos():
     }), 200
 
 
+# ── Cambiar estado del pedido (admin) ─────────────────────────────────────────
 @pedidos_bp.patch("/<pedido_id>/estado")
 @admin_required
 def cambiar_estado(pedido_id):
@@ -133,6 +140,8 @@ def cambiar_estado(pedido_id):
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 200
 
 
+# ── Eliminar pedido (admin) ───────────────────────────────────────────────────
+# Eliminación permanente (los pedidos no tienen soft-delete).
 @pedidos_bp.delete("/<pedido_id>")
 @admin_required
 def eliminar_pedido(pedido_id):

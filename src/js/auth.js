@@ -1,3 +1,6 @@
+// ── Sesión en localStorage ───────────────────────────────────────────────────
+// Guarda y lee token JWT y datos del usuario para mantener la sesión entre páginas.
+
 function guardarSesion(token, usuario) {
   localStorage.setItem("admin_token", token);
   localStorage.setItem("usuario_data", JSON.stringify(usuario));
@@ -17,6 +20,7 @@ function getUsuario() {
   return data ? JSON.parse(data) : null;
 }
 
+// Helpers de estado de sesión usados en otros archivos
 function estaLogueado() {
   return !!getToken();
 }
@@ -26,12 +30,15 @@ function esAdmin() {
   return usuario ? usuario.es_admin === true : false;
 }
 
-// Devuelve "../" si estamos dentro de /pages/, "" si estamos en la raíz
+// ── Rutas relativas ──────────────────────────────────────────────────────────
+// Devuelve "../" si estamos dentro de /pages/, "" si estamos en la raíz.
+// Necesario porque los HTML están en dos niveles distintos.
 function getPrefijo() {
   return window.location.pathname.includes("/pages/") ? "../" : "";
 }
 
-// Llena #navAuth con el botón de login o los datos del usuario según la sesión
+// ── Navbar dinámica ──────────────────────────────────────────────────────────
+// Inyecta en #navAuth el botón de login o los datos del usuario según la sesión.
 function inicializarNavbar() {
   const contenedor = document.getElementById("navAuth");
   if (!contenedor) return;
@@ -70,6 +77,7 @@ function inicializarNavbar() {
   `;
 }
 
+// ── Logout ───────────────────────────────────────────────────────────────────
 function logout() {
   cerrarSesion();
   window.location.href = getPrefijo() + "index.html";
