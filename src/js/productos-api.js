@@ -72,19 +72,6 @@ async function cargarCatalogo() {
     // Avisar a main.js que el DOM de productos está listo (filtros y paginación)
     document.dispatchEvent(new CustomEvent("productosListos"));
 
-    const contadores = { "materia-prima": 0, "elaborados": 0, "herramientas": 0 };
-    productos.forEach((p) => {
-      if (contadores[p.categoria] !== undefined) contadores[p.categoria]++;
-    });
-
-    document.querySelectorAll("[data-filtro]").forEach((btn) => {
-      const cat = btn.dataset.filtro;
-      const span = btn.querySelector(".catalogo__filtro-count");
-      if (span && contadores[cat] !== undefined) {
-        span.textContent = contadores[cat];
-      }
-    });
-
   } catch (error) {
     grilla.innerHTML = `
       <p style="color: red; grid-column: 1/-1; text-align: center;">
