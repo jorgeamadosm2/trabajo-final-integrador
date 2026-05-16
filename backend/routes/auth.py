@@ -12,8 +12,8 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
 # ── Registro ──────────────────────────────────────────────────────────────────
-# Crea un nuevo usuario. Si el campo "codigo_admin" coincide con ADMIN_SECRET_CODE,
-# el usuario queda registrado con rol admin.
+# Si el usuario ingresa el código secreto de admin, queda con ese rol desde el registro.
+# Si no, se registra como usuario normal. Así no necesito un endpoint separado para crear admins.
 @auth_bp.post("/register")
 def register():
     data = request.get_json()
@@ -47,8 +47,9 @@ def register():
 
 
 # ── Login ─────────────────────────────────────────────────────────────────────
-# Valida credenciales y devuelve un JWT de 24 horas.
-# El mensaje de error es genérico para no revelar si el email existe.
+# El mensaje de error es genérico a propósito: si digo "email no encontrado"
+# o "contraseña incorrecta" por separado, le estaría dando información útil a alguien
+# que intenta adivinar cuentas existentes.
 @auth_bp.post("/login")
 def login():
     data = request.get_json()
@@ -73,7 +74,8 @@ def login():
     }), 200
 
 
-# ── Perfil del usuario autenticado ────────────────────────────────────────────
+# ── Perfil propio ─────────────────────────────────────────────────────────────
+# Devuelve los datos del usuario autenticado. El id viene del JWT, no de la URL.
 @auth_bp.get("/me")
 @jwt_required()
 def me():
@@ -83,9 +85,10 @@ def me():
     return jsonify({"ok": True, "usuario": usuario.to_dict()}), 200
 
 
-# ── Recuperación de contraseña: solicitud ─────────────────────────────────────
-# Genera un token temporal de 1 hora y envía el link de reseteo por email.
-# La respuesta es siempre la misma para no revelar si el email está registrado.
+# ── Recuperación de contraseña: paso 1 (solicitar link) ──────────────────────
+# Genero un token aleatorio, lo guardo en el usuario con expiración de 1 hora
+# y mando el link por email. La respuesta es siempre la misma sin importar si el email
+# existe, para no revelar qué cuentas están registradas.
 @auth_bp.post("/forgot-password")
 def forgot_password():
     data = request.get_json()
@@ -108,7 +111,7 @@ def forgot_password():
 
     frontend_url = current_app.config.get("FRONTEND_URL", "")
     reset_link   = f"{frontend_url}/pages/nueva-contrasena.html?token={token}"
-
+#crea el mensaje con el link de recuperacion 
     msg = Message(
         subject="Recuperar contraseña - CUERAR TUCUMÁN",
         recipients=[email],
@@ -127,12 +130,12 @@ def forgot_password():
         """
     )
     mail.send(msg)
-
+#devuelve un mensaje de exito, lo hace siempre para no revelar si el email existe o no
     return jsonify({"ok": True, "mensaje": "Si el email existe, recibirás las instrucciones."}), 200
 
 
-# ── Recuperación de contraseña: confirmación ──────────────────────────────────
-# Valida el token y actualiza la contraseña. Invalida el token al finalizar.
+# ── Recuperación de contraseña: paso 2 (confirmar nueva contraseña) 
+# Valida que el token exista y no haya expirado. Luego actualiza la contraseña y borra el token para que no pueda reutilizarse.
 @auth_bp.post("/reset-password")
 def reset_password():
     data = request.get_json()
@@ -163,7 +166,7 @@ def reset_password():
 
 # ── Gestión de usuarios (solo admin) ─────────────────────────────────────────
 
-# Lista todos los usuarios excepto el admin logueado (id__ne lo excluye).
+# Excluyo al admin que hace la consulta con id__ne para que no se vea a sí mismo en la lista
 @auth_bp.get("/usuarios")
 @admin_required
 def listar_usuarios():
@@ -176,7 +179,7 @@ def listar_usuarios():
     }), 200
 
 
-# Edita nombre y rol de un usuario.
+# Permite editar nombre y rol de un usuario desde el panel admin
 @auth_bp.put("/usuarios/<usuario_id>")
 @admin_required
 def editar_usuario(usuario_id):
@@ -203,7 +206,7 @@ def editar_usuario(usuario_id):
     return jsonify({"ok": True, "usuario": usuario.to_dict()}), 200
 
 
-# Activa o desactiva la cuenta de un usuario (dar de baja / reactivar).
+# Activa o desactiva la cuenta de un usuario sin borrarla
 @auth_bp.patch("/usuarios/<usuario_id>/estado")
 @admin_required
 def toggle_estado_usuario(usuario_id):

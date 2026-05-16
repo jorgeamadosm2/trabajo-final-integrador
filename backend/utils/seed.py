@@ -1,7 +1,8 @@
 """
-Script de carga inicial de productos en MongoDB.
+Script para cargar los productos iniciales en MongoDB.
+Se ejecuta una sola vez (o cuando se quiere resetear el catálogo).
 Uso: python utils/seed.py  (desde la carpeta backend/)
-Pregunta si borrar los existentes antes de insertar, para evitar duplicados.
+Antes de insertar pregunta si borrar los existentes para evitar duplicados.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,7 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import create_app
 from models import Producto
 
-# ── Datos de los 12 productos del catálogo ────────────────────────────────────
+# ── Productos del catálogo ────────────────────────────────────────────────────
+# Definidos acá como lista de dicts para que sea fácil agregar o modificar
+# sin tocar la lógica del script.
 PRODUCTOS = [
     # Materia prima
     {
@@ -88,10 +91,11 @@ PRODUCTOS = [
     },
 ]
 
-# ── Función principal ─────────────────────────────────────────────────────────
+
 def seed():
     app = create_app()
     with app.app_context():
+        # Si ya hay productos, pregunto antes de borrar para no pisarlos por accidente
         existentes = Producto.objects.count()
         if existentes > 0:
             print(f"⚠️  Ya hay {existentes} productos en la base de datos.")

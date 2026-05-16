@@ -1,7 +1,7 @@
 // ── Formulario de contacto ────────────────────────────────────────────────────
-// Intercepta el submit del formulario, envía los datos a POST /contacto y
-// reemplaza el formulario con un mensaje de confirmación si tiene éxito,
-// o muestra un error en pantalla si falla.
+// Escucha el submit del formulario, envía los datos al backend y da feedback al usuario.
+// Decidí no usar un redirect tras el éxito: prefiero reemplazar el formulario con
+// un mensaje en la misma página para que la experiencia sea más fluida.
 document.addEventListener("DOMContentLoaded", () => {
   const formulario = document.getElementById("formularioContacto");
   if (!formulario) return;
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   formulario.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
+    // Recolecto los valores directamente desde los campos del formulario
     const datos = {
       nombre:  formulario.querySelector('[name="nombre"]').value.trim(),
       email:   formulario.querySelector('[name="email"]').value.trim(),
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       mensaje: formulario.querySelector('[name="mensaje"]').value.trim(),
     };
 
-    // Deshabilitar el botón mientras se envía para evitar doble submit
+    // Deshabilito el botón para evitar que el usuario envíe el formulario dos veces
     const botonEnviar    = formulario.querySelector('[type="submit"]');
     const textoOriginal  = botonEnviar.textContent;
     botonEnviar.disabled = true;
@@ -28,7 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(datos),
       });
 
-      // Reemplazar el formulario por pantalla de confirmación
+      // Reemplazo el contenido del formulario por la pantalla de confirmación.
+      // Así no pierdo el layout de la sección pero el usuario ve que todo salió bien.
       formulario.innerHTML = `
         <div style="
           text-align: center;
@@ -46,7 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
     } catch (error) {
-      // Mostrar el error encima del formulario sin perder los datos cargados
+      // Si falla, muestro el error arriba del formulario sin borrar lo que el usuario escribió.
+      // Creo el div de error solo si no existe (para evitar duplicados si el usuario reintenta).
       let mensajeError = document.getElementById("error-formulario");
       if (!mensajeError) {
         mensajeError = document.createElement("div");
@@ -63,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       mensajeError.textContent = `Error: ${error.message}. Verificá los datos e intentá de nuevo.`;
 
+      // Vuelvo a habilitar el botón para que pueda reintentar
       botonEnviar.disabled = false;
       botonEnviar.textContent = textoOriginal;
     }

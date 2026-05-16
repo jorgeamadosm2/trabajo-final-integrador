@@ -3,9 +3,10 @@ from mongoengine import (Document, EmbeddedDocument, StringField, FloatField,
 from datetime import datetime
 
 
-# ── Modelo: ItemPedido (embebido) ─────────────────────────────────────────────
-# Representa un producto dentro de un pedido. Guarda un snapshot del nombre y
-# precio al momento de la compra, para que cambios futuros no alteren el historial.
+# ── Modelo: ItemPedido ────────────────────────────────────────────────────────
+# Cada item del pedido se guarda como documento embebido dentro de Pedido.
+# Guardo un snapshot del nombre y precio en el momento de la compra, no una referencia
+# al producto. Así si el precio cambia después, el historial no se altera.
 class ItemPedido(EmbeddedDocument):
     producto_id = StringField()
     nombre      = StringField(required=True)
@@ -25,14 +26,13 @@ class ItemPedido(EmbeddedDocument):
 
 
 # ── Modelo: Pedido ────────────────────────────────────────────────────────────
-# Colección "pedidos" en MongoDB, ordenada por fecha descendente.
-# Los datos del usuario también son snapshot para preservar el historial si
-# la cuenta cambia o se elimina.
+# Colección principal de pedidos. Guarda también un snapshot del usuario
+# (nombre y email) para que el historial quede intacto si esa cuenta se modifica o elimina.
 class Pedido(Document):
     numero         = StringField(required=True, unique=True)
     usuario_id     = StringField()
-    usuario_nombre = StringField()   # snapshot del nombre al momento del pedido
-    usuario_email  = StringField()   # snapshot del email al momento del pedido
+    usuario_nombre = StringField()
+    usuario_email  = StringField()
     items          = ListField(EmbeddedDocumentField(ItemPedido))
     total          = FloatField(required=True)
     estado         = StringField(default="pendiente", choices=["pendiente", "procesado"])
@@ -41,7 +41,7 @@ class Pedido(Document):
 
     meta = {
         "collection": "pedidos",
-        "ordering": ["-created_at"]
+        "ordering": ["-created_at"]  # los más recientes primero en el panel admin
     }
 
     def to_dict(self):
