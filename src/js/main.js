@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ── Menú hamburguesa ──────────────────────────────────────────────────────
-    // Abre/cierra el menú en mobile. Se cierra también al hacer clic en un enlace
-    // o fuera del menú.
+    // El menú mobile se abre y cierra con la clase "activo". También se cierra
+    // al tocar un enlace o al hacer clic fuera para no dejarlo abierto accidentalmente.
     const botonMenu = document.getElementById('botonMenu');
-    const menuNav   = document.getElementById('menuNav');
+    const menuNav = document.getElementById('menuNav');
 
     if (botonMenu && menuNav) {
         botonMenu.addEventListener('click', () => {
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menuNav.classList.toggle('activo');
         });
 
+        // Cada enlace del nav cierra el menú al hacer click en mobile
         menuNav.querySelectorAll('.encabezado__enlace-nav').forEach(enlace => {
             enlace.addEventListener('click', () => {
                 botonMenu.classList.remove('activo');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Click fuera del menú y del botón también lo cierra
         document.addEventListener('click', (e) => {
             if (!menuNav.contains(e.target) && !botonMenu.contains(e.target)) {
                 botonMenu.classList.remove('activo');
@@ -27,24 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── Sombra del header al hacer scroll ────────────────────────────────────
-    // Oscurece el fondo del encabezado cuando el usuario baja más de 80px.
+    // ── Sombra del encabezado al hacer scroll 
+    // Le agrego sombra y oscurezco un poco el header cuando el usuario baja más de 80px.
+    // Ese umbral lo elegí para que no cambie al primer movimiento sino cuando ya bajó un poco.
     const encabezado = document.getElementById('encabezado');
     if (encabezado) {
         window.addEventListener('scroll', () => {
             if (window.scrollY > 80) {
-                encabezado.style.background  = 'rgba(26, 18, 9, 0.98)';
-                encabezado.style.boxShadow   = '0 4px 20px rgba(0,0,0,0.3)';
+                encabezado.style.background = 'rgba(26, 18, 9, 0.98)';
+                encabezado.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
             } else {
-                encabezado.style.background  = 'rgba(26, 18, 9, 0.92)';
-                encabezado.style.boxShadow   = 'none';
+                encabezado.style.background = 'rgba(26, 18, 9, 0.92)';
+                encabezado.style.boxShadow = 'none';
             }
         });
     }
 
-    // ── Animación de aparición al hacer scroll ────────────────────────────────
-    // Usa IntersectionObserver para animar con fade + slide-up los elementos
-    // cuando entran en el viewport. El delay escalonado crea un efecto cascada.
+    // ── Animación de aparición en scroll 
+    // Uso IntersectionObserver para animar los elementos cuando entran al viewport.
+    // El delay escalonado (i * 0.08s) crea un efecto de cascada entre las tarjetas.
+    // Una vez que el elemento se animó, dejo de observarlo para no re-animar si sube.
     const elementosRevelar = document.querySelectorAll(
         '.tarjeta-beneficio, .tarjeta-categoria, .tarjeta-producto, .tarjeta-testimonio, .vista-nosotros__grilla, .encabezado-seccion'
     );
@@ -52,24 +56,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const observadorRevelar = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity   = '1';
+                entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
-                observadorRevelar.unobserve(entry.target); // animación solo una vez
+                observadorRevelar.unobserve(entry.target);
             }
         });
     }, {
         threshold: 0.1,
-        rootMargin: '0px 0px -60px 0px'
+        rootMargin: '0px 0px -60px 0px' // el elemento tiene que entrar un poco más antes de activarse
     });
 
     elementosRevelar.forEach((el, i) => {
-        el.style.opacity    = '0';
-        el.style.transform  = 'translateY(30px)';
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
         el.style.transition = `opacity 0.6s ease ${i * 0.08}s, transform 0.6s ease ${i * 0.08}s`;
         observadorRevelar.observe(el);
     });
 
-    // ── Scroll suave para enlaces ancla ──────────────────────────────────────
+    // ── Scroll suave para enlaces ancla 
     document.querySelectorAll('a[href^="#"]').forEach(ancla => {
         ancla.addEventListener('click', function (e) {
             e.preventDefault();
@@ -80,21 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── Filtros y paginación del catálogo ────────────────────────────────────
-    // Se inicializa cuando productos-api.js termina de insertar las cards ("productosListos").
-    // Calcula cuántos productos mostrar por página según las columnas reales del grid CSS.
+    // Filtros y paginación del catálogo 
+    // Esta función espera a que productos-api.js termine de insertar las tarjetas
     function inicializarFiltros() {
-        const filtros           = document.querySelectorAll('.catalogo__filtro');
-        const todasLasTarjetas  = Array.from(document.querySelectorAll('.catalogo__grilla .tarjeta-producto'));
-        const resultado         = document.getElementById('catalogo__resultado');
-        const contenedorPag     = document.getElementById('paginacion');
+        const filtros = document.querySelectorAll('.catalogo__filtro');
+        const todasLasTarjetas = Array.from(document.querySelectorAll('.catalogo__grilla .tarjeta-producto'));
+        const resultado = document.getElementById('catalogo__resultado');
+        const contenedorPag = document.getElementById('paginacion');
 
         if (filtros.length === 0 || todasLasTarjetas.length === 0) return;
 
         let tarjetasFiltradas = todasLasTarjetas;
-        let paginaActual      = 1;
+        let paginaActual = 1;
 
-        // Lee el número real de columnas del grid para calcular items por página de forma responsiva
+        // Calculo los items por página leyendo cuántas columnas tiene el grid en ese momento.
+        // Así la paginación es automáticamente responsiva: 2 columnas = 4 por página, 4 = 8, etc.
         function calcularPorPagina() {
             const grilla = document.getElementById('grillaProductos');
             if (!grilla) return 8;
@@ -102,22 +106,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return columnas * 2;
         }
 
-        // Muestra solo los productos de la página actual y oculta el resto
+        // Oculta todas las tarjetas que no corresponden a la página actual y muestra las que sí
         function actualizarVista() {
-            const porPagina    = calcularPorPagina();
-            const total        = tarjetasFiltradas.length;
+            const porPagina = calcularPorPagina();
+            const total = tarjetasFiltradas.length;
             const totalPaginas = Math.max(1, Math.ceil(total / porPagina));
 
             if (paginaActual > totalPaginas) paginaActual = totalPaginas;
 
             const inicio = (paginaActual - 1) * porPagina;
-            const fin    = inicio + porPagina;
+            const fin = inicio + porPagina;
 
             todasLasTarjetas.forEach(t => {
-                const idx     = tarjetasFiltradas.indexOf(t);
+                const idx = tarjetasFiltradas.indexOf(t);
                 const visible = idx >= inicio && idx < fin;
-                t.classList.toggle('oculto',  !visible);
-                t.classList.toggle('mostrar',  visible);
+                t.classList.toggle('oculto', !visible);
+                t.classList.toggle('mostrar', visible);
             });
 
             if (resultado) {
@@ -128,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderizarPaginacion(totalPaginas);
         }
 
-        // Genera los botones de paginación dinámicamente
+        // Genera los botones de página dinámicamente para que se adapten a la cantidad de resultados
         function renderizarPaginacion(totalPaginas) {
             if (!contenedorPag) return;
             if (totalPaginas <= 1) { contenedorPag.innerHTML = ''; return; }
@@ -156,11 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Al cambiar de página scrolleo al inicio del catálogo para que el usuario no quede
+        // mirando el footer mientras los productos nuevos aparecen arriba
         function scrollAlCatalogo() {
             document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Filtra las tarjetas por categoría y vuelve a la página 1
+        // Al filtrar vuelvo a la página 1 porque la cantidad de resultados puede cambiar
         function aplicarFiltro(categoria) {
             tarjetasFiltradas = categoria === 'todos'
                 ? todasLasTarjetas
@@ -177,11 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Recalcular al redimensionar porque cambian las columnas del grid
+        // Al redimensionar la ventana recalculo por si cambia la cantidad de columnas
         window.addEventListener('resize', actualizarVista);
         aplicarFiltro('todos');
     }
 
-    // Espera a que productos-api.js haya insertado las tarjetas en el DOM
+    // El evento "productosListos" lo dispara productos-api.js cuando termina de insertar el HTML.
+    // Así garantizo que los filtros se inicialicen con las tarjetas ya en el DOM.
     document.addEventListener('productosListos', inicializarFiltros);
 });

@@ -8,7 +8,9 @@ from utils.decorators import admin_required
 contacto_bp = Blueprint("contacto", __name__, url_prefix="/api/contacto")
 
 
-# ── Validación de payload ─────────────────────────────────────────────────────
+# ── Validación del formulario ─────────────────────────────────────────────────
+# La separé en una función aparte para no repetir la misma lógica si en el futuro
+# necesito validar en otro endpoint también. Devuelve una lista de errores.
 def _validar_mensaje(data):
     errores = []
     if not data.get("nombre", "").strip():
@@ -24,7 +26,7 @@ def _validar_mensaje(data):
 
 
 # ── Enviar mensaje (público) ──────────────────────────────────────────────────
-# Cualquier visitante puede enviar un mensaje sin necesidad de estar logueado.
+# Este endpoint no requiere login. Cualquier visitante puede contactarnos.
 @contacto_bp.post("")
 def enviar_mensaje():
     data = request.get_json()
@@ -49,8 +51,9 @@ def enviar_mensaje():
     }), 201
 
 
-# ── Listar mensajes (admin) ───────────────────────────────────────────────────
-# Acepta filtro opcional ?no_leidos=true para mostrar solo los no revisados.
+# ── Listar mensajes (solo admin) ──────────────────────────────────────────────
+# Acepta el parámetro ?no_leidos=true para filtrar solo los no revisados.
+# El filtrado lo hago en la query de MongoDB, no en Python, para no traer todo a memoria.
 @contacto_bp.get("")
 @admin_required
 def listar_mensajes():
@@ -67,7 +70,7 @@ def listar_mensajes():
     }), 200
 
 
-# ── Marcar como leído (admin) ─────────────────────────────────────────────────
+# ── Marcar como leído (solo admin) ───────────────────────────────────────────
 @contacto_bp.patch("/<mensaje_id>/leido")
 @admin_required
 def marcar_leido(mensaje_id):
@@ -84,7 +87,7 @@ def marcar_leido(mensaje_id):
     return jsonify({"ok": True, "mensaje": mensaje.to_dict()}), 200
 
 
-# ── Eliminar mensaje (admin) ──────────────────────────────────────────────────
+# ── Eliminar mensaje (solo admin) ─────────────────────────────────────────────
 @contacto_bp.delete("/<mensaje_id>")
 @admin_required
 def eliminar_mensaje(mensaje_id):

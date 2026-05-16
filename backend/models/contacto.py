@@ -1,11 +1,13 @@
 from mongoengine import Document, StringField, BooleanField, DateTimeField, EmailField
 from datetime import datetime
 
+# Los asuntos posibles los defino acá como constante para reutilizarlos
+# en la validación del backend sin repetir la lista en dos lugares.
 ASUNTOS_VALIDOS = ["consulta", "mayorista", "pedido", "otro"]
 
 # ── Modelo: MensajeContacto ───────────────────────────────────────────────────
-# Colección "mensajes_contacto" en MongoDB, ordenada por fecha descendente.
-# El campo "leido" permite al admin distinguir mensajes nuevos de los ya revisados.
+# Representa un mensaje enviado desde el formulario de contacto.
+# El campo "leido" me permite distinguir en el panel admin cuáles ya fueron revisados.
 class MensajeContacto(Document):
     nombre   = StringField(required=True, max_length=150)
     email    = EmailField(required=True)
@@ -16,9 +18,11 @@ class MensajeContacto(Document):
 
     meta = {
         "collection": "mensajes_contacto",
-        "ordering": ["-created_at"]
+        "ordering": ["-created_at"]  # los más nuevos primero
     }
 
+    # Convierto el documento a dict para poder devolverlo en las respuestas JSON.
+    # El id de MongoDB es un ObjectId, así que lo paso a string.
     def to_dict(self):
         return {
             "id":         str(self.id),

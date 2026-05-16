@@ -10,7 +10,8 @@ productos_bp = Blueprint("productos", __name__, url_prefix="/api/productos")
 
 
 # ── Validación de payload ─────────────────────────────────────────────────────
-# Centraliza las reglas de validación para crear y editar productos.
+# Centralizo las reglas para crear y editar en una sola función para no repetir código.
+# Devuelve una lista de errores para poder mostrarlos todos juntos al usuario.
 def _validar_producto(data):
     errores = []
     if not data.get("nombre", "").strip():
@@ -30,14 +31,18 @@ def _validar_producto(data):
 
 
 # ── Listar productos ──────────────────────────────────────────────────────────
-# Público por defecto (solo activos). Con ?todos=true y token de admin devuelve
-# también los inactivos. Acepta filtros opcionales: ?categoria= y ?destacado=true.
+# Por defecto es público y devuelve solo los activos.
+# Si se envía ?todos=true con token de admin, incluye también los inactivos.
+# Acepta filtros opcionales: ?categoria= y ?destacado=true
 @productos_bp.get("")
 def listar_productos():
     from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
     from models import Usuario
 
     mostrar_todos = request.args.get("todos", "").lower() == "true"
+
+    # Verifico si tiene token de admin antes de mostrar inactivos.
+    # Si el token falla o no existe, simplemente muestro solo los activos.
     if mostrar_todos:
         try:
             verify_jwt_in_request()
@@ -68,7 +73,7 @@ def listar_productos():
 
 
 # ── Productos destacados (home) ───────────────────────────────────────────────
-# Devuelve hasta 3 productos activos marcados como destacados.
+# Endpoint específico para la sección de destacados. Limitado a 3 para no sobrecargar el home.
 @productos_bp.get("/destacados")
 def productos_destacados():
     productos = Producto.objects(activo=True, destacado=True).limit(3)
@@ -92,7 +97,7 @@ def obtener_producto(producto_id):
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
-# ── Crear producto (admin) ────────────────────────────────────────────────────
+# ── Crear producto (solo admin) ───────────────────────────────────────────────
 @productos_bp.post("")
 @admin_required
 def crear_producto():
@@ -126,7 +131,7 @@ def crear_producto():
     return jsonify({"ok": True, "producto": producto.to_dict()}), 201
 
 
-# ── Editar producto (admin) ───────────────────────────────────────────────────
+# ── Editar producto (solo admin) ──────────────────────────────────────────────
 @productos_bp.put("/<producto_id>")
 @admin_required
 def editar_producto(producto_id):
@@ -146,16 +151,16 @@ def editar_producto(producto_id):
     if errores:
         return jsonify({"ok": False, "errores": errores}), 400
 
-    stock_raw           = data.get("stock")
-    producto.nombre     = data["nombre"].strip()
+    stock_raw            = data.get("stock")
+    producto.nombre      = data["nombre"].strip()
     producto.descripcion = data.get("descripcion", producto.descripcion)
-    producto.precio     = float(data["precio"])
-    producto.unidad     = data.get("unidad", producto.unidad)
-    producto.categoria  = data["categoria"]
-    producto.imagen_url = data.get("imagen_url", producto.imagen_url)
-    producto.etiqueta   = data.get("etiqueta", producto.etiqueta)
-    producto.destacado  = bool(data.get("destacado", producto.destacado))
-    producto.stock      = int(stock_raw) if stock_raw is not None else None
+    producto.precio      = float(data["precio"])
+    producto.unidad      = data.get("unidad", producto.unidad)
+    producto.categoria   = data["categoria"]
+    producto.imagen_url  = data.get("imagen_url", producto.imagen_url)
+    producto.etiqueta    = data.get("etiqueta", producto.etiqueta)
+    producto.destacado   = bool(data.get("destacado", producto.destacado))
+    producto.stock       = int(stock_raw) if stock_raw is not None else None
     if "activo" in data:
         producto.activo = bool(data["activo"])
     producto.updated_at = datetime.utcnow()
@@ -164,9 +169,9 @@ def editar_producto(producto_id):
     return jsonify({"ok": True, "producto": producto.to_dict()}), 200
 
 
-# ── Eliminar producto (admin) — soft-delete ───────────────────────────────────
-# No borra el documento: pone activo=False para ocultar del catálogo público
-# y preservar el historial en pedidos existentes.
+# ── Eliminar producto (solo admin) — soft-delete ──────────────────────────────
+# No borro el documento de MongoDB. Solo pongo activo=False para que no aparezca
+# en el catálogo público pero siga existiendo en el historial de pedidos.
 @productos_bp.delete("/<producto_id>")
 @admin_required
 def eliminar_producto(producto_id):

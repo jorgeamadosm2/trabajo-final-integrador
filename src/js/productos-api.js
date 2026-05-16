@@ -1,6 +1,6 @@
-// ── Renderizado de tarjetas ───────────────────────────────────────────────────
-// Genera el HTML de una tarjeta de producto. Maneja etiquetas, estado sin stock
-// y adapta la ruta de la imagen según desde qué página se renderiza.
+// ── Tarjeta de producto ───────────────────────────────────────────────────────
+// Genera el HTML de una tarjeta. Lo separé en su propia función para reutilizarlo
+// tanto en el catálogo completo como en la sección de destacados del home.
 function renderizarCard(producto) {
   const claseEtiqueta = producto.etiqueta === "Popular"
     ? "tarjeta-producto__etiqueta tarjeta-producto__etiqueta--popular"
@@ -10,12 +10,15 @@ function renderizarCard(producto) {
     ? `<div class="${claseEtiqueta}">${producto.etiqueta}</div>`
     : "";
 
-  // stock=null significa sin control de stock (no sin existencias)
+  // stock=null significa que ese producto no tiene control de stock (cantidad ilimitada).
+  // Es diferente a stock=0 que significa que está agotado. Hay que distinguir bien los dos casos.
   const sinStock = producto.stock !== null && producto.stock !== undefined && producto.stock === 0;
 
   const precioFormateado = producto.precio.toLocaleString("es-AR");
   const unidad = producto.unidad ? ` /${producto.unidad}` : "";
   const imagenSrc = producto.imagen_url || "../src/img/materia-prima.png";
+
+  // La ruta al formulario de contacto cambia según si estoy en /pages/ o en la raíz
   const esRaiz = !window.location.pathname.includes('/pages/');
   const rutaContacto = esRaiz ? "pages/contacto.html" : "contacto.html";
 
@@ -55,10 +58,8 @@ function renderizarCard(producto) {
   `;
 }
 
-// ── Carga del catálogo completo ───────────────────────────────────────────────
-// Llama a GET /productos, renderiza todas las cards en #grillaProductos y
-// dispara el evento "productosListos" para que main.js active filtros y paginación.
-// También actualiza los contadores de cantidad por categoría en los botones de filtro.
+// ── Catálogo completo ─────────────────────────────────────────────────────────
+// Carga todos los productos activos desde la API y los inserta en la grilla.
 async function cargarCatalogo() {
   const grilla = document.getElementById("grillaProductos");
   if (!grilla) return;
@@ -69,7 +70,6 @@ async function cargarCatalogo() {
 
     grilla.innerHTML = productos.map(renderizarCard).join("");
 
-    // Avisar a main.js que el DOM de productos está listo (filtros y paginación)
     document.dispatchEvent(new CustomEvent("productosListos"));
 
   } catch (error) {
@@ -82,9 +82,8 @@ async function cargarCatalogo() {
   }
 }
 
-// ── Carga de productos destacados (home) ──────────────────────────────────────
-// Llama a GET /productos/destacados y renderiza hasta 3 cards en .destacados__grilla.
-// Limpia los paths "../src/img/" del seed para que funcionen desde la raíz del sitio.
+// ── Destacados del home ───────────────────────────────────────────────────────
+// Solo carga hasta 3 productos marcados como destacados para la sección del home.
 async function cargarDestacados() {
   const grilla = document.querySelector(".destacados__grilla");
   if (!grilla) return;

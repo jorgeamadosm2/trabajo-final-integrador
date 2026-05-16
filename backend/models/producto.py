@@ -5,9 +5,9 @@ from datetime import datetime
 CATEGORIAS_VALIDAS = ["materia-prima", "elaborados", "herramientas"]
 
 # ── Modelo: Producto ──────────────────────────────────────────────────────────
-# Colección "productos" en MongoDB, ordenada por fecha de creación descendente.
-# El campo "activo" implementa soft-delete: los productos eliminados no se borran,
-# solo se ocultan del catálogo público.
+# El campo "activo" implementa soft-delete: en vez de borrar el producto de la base
+# de datos, lo marco como inactivo. Así el catálogo no lo muestra pero el historial
+# de pedidos que lo incluyen sigue siendo válido.
 class Producto(Document):
     nombre      = StringField(required=True, max_length=200)
     descripcion = StringField()
@@ -17,8 +17,8 @@ class Producto(Document):
     imagen_url  = StringField(max_length=300)
     etiqueta    = StringField(max_length=30)
     destacado   = BooleanField(default=False)
-    activo      = BooleanField(default=True)   # False = soft-delete
-    stock       = IntField(min_value=0)        # None = sin control de stock
+    activo      = BooleanField(default=True)   # False = producto desactivado (soft-delete)
+    stock       = IntField(min_value=0)        # None = sin control de stock (cantidad ilimitada)
     creado_por  = ReferenceField("Usuario", null=True)
     created_at  = DateTimeField(default=datetime.utcnow)
     updated_at  = DateTimeField(default=datetime.utcnow)

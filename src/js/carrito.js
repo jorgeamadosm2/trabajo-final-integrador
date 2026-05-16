@@ -1,7 +1,10 @@
+// Clave con la que guardo el carrito en localStorage. La defino acá arriba
+// para poder cambiarla fácilmente si hace falta sin buscar en el código.
 const CARRITO_KEY = 'cuerar_carrito';
 
-// ── Persistencia en localStorage ─────────────────────────────────────────────
-// El carrito se guarda como JSON en localStorage para sobrevivir recargas de página.
+// ── Lectura y escritura en localStorage ──────────────────────────────────────
+// El carrito vive en localStorage como JSON, así sobrevive cuando el usuario
+// cambia de página o recarga. Cada vez que se guarda, se actualiza el badge y el panel.
 
 function obtenerCarrito() {
     return JSON.parse(localStorage.getItem(CARRITO_KEY) || '[]');
@@ -13,9 +16,10 @@ function guardarCarrito(carrito) {
     renderizarDropdownCarrito();
 }
 
-// ── Operaciones sobre items ───────────────────────────────────────────────────
+// ── Operaciones sobre los items ───────────────────────────────────────────────
 
-// Si el producto ya está en el carrito, incrementa la cantidad en lugar de duplicarlo.
+// Si el producto ya estaba en el carrito, sumo uno. Si no, lo agrego con cantidad 1.
+// Esto evita duplicados: no quiero dos filas del mismo producto.
 function agregarAlCarrito(producto) {
     const carrito   = obtenerCarrito();
     const existente = carrito.find(item => item.id === producto.id);
@@ -35,7 +39,8 @@ function eliminarDelCarrito(id) {
     if (item) mostrarNotificacion(`"${item.nombre}" eliminado del carrito`);
 }
 
-// delta = +1 o -1. Si la cantidad llega a 0, elimina el item directamente.
+// delta es +1 o -1. Si la cantidad baja a 0, directamente elimino el item
+// para no dejar productos con cantidad 0 colgando en el carrito.
 function cambiarCantidad(id, delta) {
     const carrito = obtenerCarrito();
     const item    = carrito.find(i => i.id === id);
@@ -52,8 +57,9 @@ function calcularTotal(carrito) {
     return carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 }
 
-// ── Badge del ícono ───────────────────────────────────────────────────────────
-// Actualiza el número visible sobre el ícono del carrito en el navbar.
+// ── Badge del ícono de carrito ────────────────────────────────────────────────
+// Uso querySelectorAll porque el badge puede aparecer en más de un lugar del HTML
+// (por ejemplo, en mobile y en desktop con clases distintas).
 function actualizarBadge() {
     const carrito    = obtenerCarrito();
     const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
@@ -63,9 +69,9 @@ function actualizarBadge() {
     });
 }
 
-// ── Panel desplegable ─────────────────────────────────────────────────────────
-// Renderiza la lista de items y el footer con el total dentro del panel del carrito.
-// Si no hay sesión, reemplaza el botón "Comprar" por un link al login.
+// ── Panel desplegable del carrito ─────────────────────────────────────────────
+// Renderiza la lista de items y el pie con el total.
+// Si el usuario no está logueado, el botón de comprar lleva al login en vez de al pedido.
 function renderizarDropdownCarrito() {
     const panel = document.getElementById('carritoPanel');
     if (!panel) return;
@@ -91,6 +97,8 @@ function renderizarDropdownCarrito() {
     }
 
     const total       = calcularTotal(carrito);
+
+    // La ruta a pedido.html es relativa, así que hay que ajustarla según dónde estemos
     const esPaginaRaiz = !window.location.pathname.includes('/pages/');
     const urlPedido   = esPaginaRaiz ? 'pages/pedido.html' : 'pedido.html';
 
@@ -109,7 +117,7 @@ function renderizarDropdownCarrito() {
         </div>
     `).join('');
 
-    // Si no hay sesión, el botón "Comprar" redirige al login en vez de al pedido
+    // Si no hay sesión, muestro aviso y redirijo al login en vez de dejar comprar sin cuenta
     if (typeof estaLogueado === 'function' && !estaLogueado()) {
         const urlLogin = esPaginaRaiz ? 'pages/login.html' : 'login.html';
         footerEl.innerHTML = `
@@ -133,9 +141,9 @@ function mostrarToast(mensaje) {
     mostrarNotificacion(mensaje);
 }
 
-// ── Inicialización del widget ─────────────────────────────────────────────────
-// Construye el botón del carrito y el panel desplegable, los inserta antes de
-// #navAuth en el navbar, y configura los eventos de apertura/cierre.
+// ── Construcción del widget del carrito ───────────────────────────────────────
+// Creo el botón y el panel por JavaScript porque el carrito se usa en todas las páginas
+// y así no tengo que copiar el HTML en cada una. Lo inserto antes de #navAuth en el nav.
 function inicializarCarrito() {
     const authDiv = document.getElementById('navAuth');
     if (!authDiv) return;
@@ -171,7 +179,7 @@ function inicializarCarrito() {
     authDiv.parentNode.insertBefore(wrapper, authDiv);
 
     botonCarrito.addEventListener('click', e => {
-        e.stopPropagation();
+        e.stopPropagation(); // evito que el click cierre el panel al instante por el listener global
         panel.classList.toggle('carrito__panel--abierto');
         if (panel.classList.contains('carrito__panel--abierto')) {
             renderizarDropdownCarrito();
@@ -182,7 +190,7 @@ function inicializarCarrito() {
         panel.classList.remove('carrito__panel--abierto');
     });
 
-    // Cerrar al hacer clic fuera del panel
+    // Cierra el panel si el usuario hace clic en cualquier parte fuera de él
     document.addEventListener('click', e => {
         if (!wrapper.contains(e.target)) {
             panel.classList.remove('carrito__panel--abierto');
@@ -193,9 +201,10 @@ function inicializarCarrito() {
     renderizarDropdownCarrito();
 }
 
-// ── Event delegation para botones de agregar ──────────────────────────────────
-// Escucha clicks a nivel del document para capturar botones en tarjetas
-// generadas dinámicamente por productos-api.js (que aún no existen al cargar).
+// ── Event delegation para botones de tarjetas ─────────────────────────────────
+// No puedo poner el listener directamente en los botones de las tarjetas porque
+// esas tarjetas las genera productos-api.js después de que esta función corre.
+// La solución es escuchar el click a nivel del document y filtrar por clase.
 document.addEventListener('click', e => {
     const btn = e.target.closest('.tarjeta-producto__boton-carrito');
     if (!btn) return;

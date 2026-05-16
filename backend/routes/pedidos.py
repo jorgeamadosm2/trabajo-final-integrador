@@ -13,7 +13,8 @@ pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/api/pedidos")
 
 # ── Crear pedido ──────────────────────────────────────────────────────────────
 # Solo usuarios autenticados y activos pueden crear pedidos.
-# Flujo: verificar stock → guardar pedido → descontar stock.
+# El flujo es: verificar stock de todos los items → guardar el pedido → descontar stock.
+# Separo la verificación del descuento para no descontar si algún item falla la validación.
 @pedidos_bp.post("")
 @jwt_required()
 def crear_pedido():
@@ -40,7 +41,8 @@ def crear_pedido():
     if Pedido.objects(numero=numero).first():
         return jsonify({"ok": False, "error": "Ya existe un pedido con ese número"}), 409
 
-    # Verificar stock de todos los items antes de confirmar el pedido
+    # Verifico el stock de todos los productos antes de confirmar nada.
+    # Si alguno está agotado, rechazo el pedido completo sin tocar la base de datos.
     for item in items_raw:
         producto_id = item.get("id", "")
         if not producto_id:
@@ -70,7 +72,8 @@ def crear_pedido():
             unidad      = str(item.get("unidad", "") or ""),
         ))
 
-    # Guardar snapshot del usuario para preservar el historial aunque cambie su cuenta
+    # Guardo un snapshot del usuario para que el historial no cambie
+    # si el usuario modifica su nombre o email más adelante
     pedido = Pedido(
         numero         = numero,
         usuario_id     = str(usuario.id),
@@ -81,7 +84,8 @@ def crear_pedido():
     )
     pedido.save()
 
-    # Descontar stock tras confirmar el pedido (nunca llegar a negativo)
+    # Descuento el stock después de guardar el pedido.
+    # max(0, ...) asegura que nunca quede en negativo aunque haya algún caso raro.
     for item in items_raw:
         producto_id = item.get("id", "")
         if not producto_id:
@@ -98,8 +102,8 @@ def crear_pedido():
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 201
 
 
-# ── Listar pedidos (admin) ────────────────────────────────────────────────────
-# Acepta filtro opcional ?estado=pendiente|procesado.
+# ── Listar pedidos (solo admin) ───────────────────────────────────────────────
+# Acepta filtro opcional ?estado=pendiente o ?estado=procesado
 @pedidos_bp.get("")
 @admin_required
 def listar_pedidos():
@@ -116,7 +120,7 @@ def listar_pedidos():
     }), 200
 
 
-# ── Cambiar estado del pedido (admin) ─────────────────────────────────────────
+# ── Cambiar estado del pedido (solo admin) ────────────────────────────────────
 @pedidos_bp.patch("/<pedido_id>/estado")
 @admin_required
 def cambiar_estado(pedido_id):
@@ -140,8 +144,8 @@ def cambiar_estado(pedido_id):
     return jsonify({"ok": True, "pedido": pedido.to_dict()}), 200
 
 
-# ── Eliminar pedido (admin) ───────────────────────────────────────────────────
-# Eliminación permanente (los pedidos no tienen soft-delete).
+# ── Eliminar pedido (solo admin) ──────────────────────────────────────────────
+# Los pedidos se borran definitivamente, no tienen soft-delete como los productos.
 @pedidos_bp.delete("/<pedido_id>")
 @admin_required
 def eliminar_pedido(pedido_id):
